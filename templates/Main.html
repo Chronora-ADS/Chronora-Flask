@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}"> 
+    <title>Página Inicial</title>
+</head>
+<body>
+    <div id="container">
+        <div id="container-header">
+            <div id="icon-left">
+                <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
+                <p id="icon-left-text">Chronora</p>
+            </div>
+            <div id="search-bar">
+                <div class="search-container">
+                    <input type="text" name="search-bar" placeholder="Pintura de parede, aula de inglês..." id="input-search-bar">
+                    <img src="{{ url_for('static', filename='img/Search.png') }}" alt="" class="icon-search">
+                </div>
+            </div>
+            <div id="navbar-buttons">
+                <a class="navbar-a" href="{{ url_for('service_creation') }}"><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a> 
+                <div class="qty-chronos">
+                    <img class="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
+                    <p class="qty-chronos-text">123</p>
+                </div>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Briefcase.png') }}" alt=""></a>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Profile.png') }}" alt=""></a>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Settings.png') }}" alt=""></a>
+            </div>
+        </div>
+        <div id="container-background">
+            <img class="background" id="comb-left" src="{{ url_for('static', filename='img/Comb3.png') }}" alt="">
+            <img class="background" id="comb-right" src="{{ url_for('static', filename='img/Comb4.png') }}" alt="">
+        </div>
+        <div id="container-form">
+            <div id="container-makerequest">
+                <div id="makerequest-content">
+                    <h3>As horas acumuladas no seu banco representam oportunidades reais de ação.</h3>
+                    <div id="makerequest-btn">
+                        <a id="add-service-a" href="{{ url_for('service_creation') }}">Faça um pedido<img src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a> 
+                    </div>
+                    <h3>Ou realize o de alguém</h3>
+                    <img src="{{ url_for('static', filename='img/White Lines.png') }}" alt="" id="white-lines">
+                </div>
+            </div>
+            <div id="container-requests">
+                <div id="requests-filter">
+                    <div class="filter-item">
+                        <h3>Avaliação de usuário</h3>
+                        <select name="avaliacao" id="filtro-avaliacao">
+                            <option value="0">0 - 1 estrelas</option>
+                            <option value="1">1 - 2 estrelas</option>
+                            <option value="2">2 - 3 estrelas</option>
+                            <option value="3">3 - 4 estrelas</option>
+                            <option value="4">4 - 5 estrelas</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <h3>Tempo </h3>
+                        <div class="slider-container">
+                            <input type="range" id="tempo-slider" min="5" max="100" step="5" value="5">
+                            <span id="tooltip" class="tooltip">0-5</span>
+                        </div>
+                    </div>
+                    <div class="filter-item">
+                        <h3>Categorias</h3>
+                        <input list="categorias-lista" id="filtro-categorias" name="categorias" placeholder="Digite ou escolha">
+                        <datalist id="categorias-lista"></datalist>
+                    </div>
+                    <div class="filter-item">
+                        <h3>Ordenação</h3>
+                        <select name="ordenacao" id="filtro-ordenacao">
+                            <option value="0">Mais recentes</option>
+                            <option value="1">Mais antigos</option>
+                            <option value="2">Melhores avaliados</option>
+                            <option value="3">Maior tempo</option>
+                            <option value="4">Menor tempo</option>
+                        </select>
+                    </div>
+                </div>
+            <div id="requests"></div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/AccountCreation.js') }}"></script> 
+    <script src="{{ url_for('static', filename='js/Main.js') }}"></script>
+</body>
+</html>

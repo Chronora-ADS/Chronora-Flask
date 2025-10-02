@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ServiceCreation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
+</head>
+<body>
+    <div id="container">
+        <div id="container-header">
+            <div id="icon-left">
+                <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
+                <p id="icon-left-text">Chronora</p>
+            </div>
+            <div id="search-bar">
+                <div class="search-container">
+                    <input type="text" name="search-bar" placeholder="Pintura de parede, aula de inglês..." id="input-search-bar">
+                    <img src="{{ url_for('static', filename='img/Search.png') }}" alt="" class="icon-search">
+                </div>
+            </div>
+            <div id="navbar-buttons">
+                <a class="navbar-a" href="{{ url_for('service_creation') }}"><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a> 
+                <div id="qty-chronos">
+                    <img id="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
+                    <p id="qty-chronos-text">123</p>
+                </div>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Briefcase.png') }}" alt=""></a>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Profile.png') }}" alt=""></a>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Settings.png') }}" alt=""></a>
+            </div>
+        </div>
+        <div id="container-background">
+            <img class="background" id="comb-left" src="{{ url_for('static', filename='img/Comb5.png') }}" alt="">
+            <img class="background" id="comb-right" src="{{ url_for('static', filename='img/Comb6.png') }}" alt="">
+            <img class="background" id="bar-right" src="{{ url_for('static', filename='img/BarDescendingRight.png') }}" alt="">
+            <img class="background" id="bar-left" src="{{ url_for('static', filename='img/BarAscending.png') }}" alt="">
+        </div>
+
+        <!-- Formulário principal -->
+        <div id="container-form">
+            <h1>Criação do pedido</h1>
+
+            <!-- Formulário com id -->
+            <form id="register-form" class="form-container">
+                <input type="text" name="titulo" placeholder="Título" id="input-title" required>
+                <textarea name="descricao" placeholder="Descrição" id="input-description" required></textarea>
+                <input type="number" min="1" name="tempoChronos" placeholder="Tempo em Chronos" id="input-time-chronos" required>
+                <!-- Campo de categoria -->
+                <div class="category-input-container">
+                    <label for="input-category" id="label-category">Categorias</label>
+                    <div class="input-with-tags">
+                        <input type="text" name="categoria" id="input-category" placeholder="Escreva e aperte Enter" />
+                        <div id="category-tag-list" class="tag-list"></div>
+                    </div>
+                </div>
+
+                <input type="file" name="input-service-image" id="input-service-image" accept=".jpg,.jpeg,.png">
+                <button type="button" id="btn-service-image">
+                    Imagem do Pedido
+                    <img src="{{ url_for('static', filename='img/AddImage.png') }}" alt="" id="icon-service-image">
+                </button>
+                <!-- <span id="service-image-chosen"></span> -->
+
+                <div id="bottom-btns">
+                    <a href="{{ url_for('main_page') }}" id="a-cancel"><button id="btn-cancel">Cancelar</button></a> 
+                    <button type="submit" id="btn-register">Criar Pedido</button>
+                </div>
+            </form>
+        </div>
+        <script src="{{ url_for('static', filename='js/ServiceCreation.js') }}"></script>
+    </div>
+</body>
+</html>
