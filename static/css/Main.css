@@ -1,0 +1,429 @@
+/* Main.css */
+
+/* Layout principal */
+#container {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Cabeçalho */
+#container-header {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 7%;
+    padding-left: 2%;
+    padding-right: 2%;
+    background-color: var(--amarelo-claro);
+    box-sizing: border-box;
+}
+
+#icon-left,
+#search-bar,
+#navbar-buttons {
+    flex-shrink: 0;
+}
+
+#icon-left {
+    display: flex;
+    align-items: center;
+    width: 20%;
+    z-index: 2;
+}
+
+#icon-left-img {
+    height: 15%;
+    width: 15%;
+}
+
+#icon-left-text {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+#search-bar {
+    width: 40%;
+    display: flex;
+    align-items: center;
+}
+
+.search-container {
+    position: relative;
+    width: 100%;
+}
+
+.icon-search {
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 50%;
+    width: auto;
+}
+
+#input-search-bar {
+    width: 100%;
+    padding-left: 35px; /* espaço à esquerda para a imagem */
+    border-radius: 10px;
+}
+
+#input-search-bar {
+    width: 100%;
+    border-radius: 10px;
+}
+
+#container-header input[type=text] {
+    font-size: 15px;
+    background: var(--branco);
+    border: 1px solid var(--branco-borda);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    padding: 10px;
+    margin: 5px;
+}
+
+#container-header input[type=text]::placeholder {
+    color: var(--texto-placeholder);
+}
+
+#navbar-buttons {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.navbar-a {
+    width: 10%;
+    height: 10%;
+}
+
+.navbar-buttons-img {
+    width: 100%;
+    height: 100%;
+}
+
+.qty-chronos {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    width: 18%;
+}
+
+.qty-chronos-img {
+    width: 55%;
+    height: 100%;
+}
+
+.qty-chronos-text {
+    font-weight: bold;
+}
+
+/* Fundo decorativo */
+.background {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+}
+
+#comb-left {
+    left: 0;
+    top: 10%;
+    width: 15%;
+}
+
+#comb-right {
+    right: 0;
+    top: 10%;
+    width: 15%;
+}
+
+/* Container principal do conteúdo */
+#container-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 10%;
+    width: 70%;
+}
+
+/* Seção "Faça um pedido" */
+#container-makerequest {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#white-lines {
+    margin-top: 5%;
+}
+
+#makerequest-content {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#makerequest-content h3 {
+    color: var(--branco);
+    font-weight: normal;
+}
+
+#add-service-a {
+    border: 1px solid var(--branco);
+    border-radius: 20px;
+    border-style: none;
+    background-color: var(--branco);
+    cursor: pointer;
+    padding: 10px 10px;
+    text-align: center;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center; /* Centraliza o conteúdo */
+    align-items: center;
+    width: 450px;
+    gap: 10px; /* Reduza o gap para aproximar texto e imagem */
+    margin: 20px;
+    text-decoration: none;
+    color: var(--preto);
+}
+
+/* Seção de pedidos */
+#container-requests {
+    width: 100%;
+}
+
+#requests-filter {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 colunas de tamanho igual */
+    gap: 5%; /* Espaçamento entre cards */
+    padding: 0;
+    width: 100%;
+}
+
+/* Estilo do slider de tempo */
+.slider-container {
+    position: relative;
+    width: 100%;
+    margin-top: 40px;
+    padding: 0 20px !important;
+    background-color: #ddd;
+    border-radius: 20px;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translateX(-50%);
+    bottom: 30px;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+#filtro-avaliacao {
+    color: black;
+}
+
+.slider-container {
+    position: relative;
+    margin-top: 0;
+    padding: 0; /* Remova o padding */
+}
+
+.slider-container .tooltip {
+    opacity: 0; /* Esconde a tooltip inicialmente */
+}
+
+.slider-container:hover .tooltip {
+    opacity: 1; /* Mostra a tooltip ao passar o mouse */
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--amarelo-claro); /* Cor da bolinha */
+}
+
+/* Estilo dos itens de filtro */
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: auto;
+}
+
+.filter-item h3 {
+    padding-left: 40px;
+    width: 100%;
+    height: auto;
+    color: var(--branco)
+}
+
+#filtro-avaliacao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    width: 100%;
+    height: 30px;
+    border: 1px solid var(--branco);
+    border-radius: 20px;
+    background-color: var(--branco);
+}
+
+#tempo-slider {
+    border-radius: 20px;
+    width: 100%;
+    height: 30px;
+}
+
+#filtro-categorias {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 30px;
+    border: 1px solid var(--branco);
+    border-radius: 20px;
+    background-color: var(--branco);
+}
+
+#filtro-categorias::placeholder {
+    padding: 0 20px;
+}
+
+#filtro-ordenacao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    width: 100%;
+    height: 30px;
+    border: 1px solid var(--branco);
+    border-radius: 20px;
+    background-color: var(--branco);
+}
+
+/* Grade de pedidos */
+#requests {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 colunas de tamanho igual */
+    gap: 5%; /* Espaçamento entre cards */
+    padding: 0;
+    width: 100%;
+    margin-top: 1%;
+}
+
+/* Cartão de serviço */
+.service-card {
+    background-color: #B5BFAE;
+    width: 100%;
+    box-sizing: border-box; /* Garante que padding/border não afetem a largura */
+    margin: 0;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-info {
+    padding: 20px;
+}
+
+.service-image {
+    width: 100%;
+    height: 45%;
+}
+
+.service-title {
+    font-size: 30px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.qty-chronos-service {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    width: 100%;
+}
+
+.qty-chronos-service-img {
+    width: 15%;
+    height: 15%;
+}
+
+.qty-chronos-service-text {
+    font-weight: bold;
+    margin: 0;
+}
+
+.user-service {
+    margin: 10px 0;
+}
+
+.categories-service {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.category-service {
+    display: flex;
+    align-items: center;
+    background-color: var(--amarelo-claro);
+    padding: 5px;
+    margin: 10px 0;
+    border-radius: 5px;
+    width: fit-content;
+}
+
+.category-service-img {
+    width: 20px;
+    height: 20px;
+}
+
+.category-service-text {
+    font-weight: bold;
+    margin: 0;
+}

@@ -1,0 +1,29 @@
+:root {
+    --amarelo-claro: #FFC300;
+    --amarelo-um-pouco-escuro: #C29503;
+    --amarelo-um-pouco-mais-escuro:rgba(194, 149, 3, 0.75);
+    --amarelo-muito-escura:rgba(194, 149, 3, 0.5);
+    --preto: #0B0C0C;
+    --branco: #E9EAEC;
+    --cinza: #B5BFAE;
+    --branco-borda: #E0E0E0;
+    --texto-placeholder: #2A2E34;
+    --azul: #013565
+}
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background-color: var(--preto);
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--preto);
+}
+
+body * {
+    font-family: sans-serif;
+}
