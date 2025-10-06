@@ -88,18 +88,7 @@ def logout():
 @service_bp.route('/post/<int:user_id>', methods=['POST'])
 @jwt_required()
 def create_service(user_id):
-    print(f"=== INICIANDO CRIAÇÃO DE SERVIÇO ===")
-    print(f"User ID da URL: {user_id}")
-    print(f"User ID do Token: {get_jwt_identity()}")
-    
-    data = request.get_json()
-    print(f"Dados recebidos: {list(data.keys()) if data else 'Nenhum'}")
-    print(f"Título: {data.get('title') if data else 'Nenhum'}")
-    print(f"TimeChronos: {data.get('timeChronos') if data else 'Nenhum'}")
-    print(f"ServiceImage length: {len(data.get('serviceImage', '')) if data else 0}")
     current_user_id = int(get_jwt_identity())
-    print(f"Type of current_user_id: {type(current_user_id)}")
-    print(f"Type of user_id from URL: {type(user_id)}")
     if current_user_id != user_id:
         return jsonify({"error": "Acesso negado."}), 403
 
@@ -107,7 +96,7 @@ def create_service(user_id):
     title = data.get('title', '').strip()
     description = data.get('description', '').strip()
     time_chronos = data.get('timeChronos')
-    # category_entities_data = data.get('categoryEntities', []) # Recebe como lista de dicionários
+    category_entities_data = data.get('categoryEntities', [])  # AGORA ATIVADO
     service_image_base64 = data.get('serviceImage', '')
 
     if not title or not description or time_chronos is None or not service_image_base64:
@@ -120,21 +109,20 @@ def create_service(user_id):
     try:
         image_bytes = base64.b64decode(service_image_base64.split(',')[1] if ',' in service_image_base64 else service_image_base64)
 
-        # --- Processamento de Categorias (exemplo básico) ---
-        # Cria objetos Category a partir dos dados recebidos
-        # Pode ser melhorado para buscar categorias existentes ou criar novas
-        # categories = []
-        # for cat_data in category_entities_data:
-        #      # Assumindo que cat_data é {'name': '...'}
-        #      cat_name = cat_data.get('name', '').strip()
-        #      if cat_name:
-        #          # Busca uma categoria existente com esse nome
-        #          category = Category.query.filter_by(name=cat_name).first()
-        #          if not category:
-        #              # Se não existir, cria uma nova
-        #              category = Category(name=cat_name)
-        #              db.session.add(category) # Adiciona ao session, mas não faz commit ainda
-        #          categories.append(category)
+        # --- PROCESSAMENTO DE CATEGORIAS (AGORA ATIVADO) ---
+        categories = []
+        for cat_data in category_entities_data:
+            cat_name = cat_data.get('name', '').strip()
+            if cat_name:
+                # Busca categoria existente (case-insensitive)
+                category = Category.query.filter(db.func.lower(Category.name) == db.func.lower(cat_name)).first()
+                if not category:
+                    # Se não existir, cria uma nova
+                    category = Category(name=cat_name)
+                    db.session.add(category)
+                    # Commit parcial para gerar ID
+                    db.session.flush()
+                categories.append(category)
 
         service = Service(
             title=title,
@@ -142,20 +130,19 @@ def create_service(user_id):
             time_chronos=time_chronos,
             service_image=image_bytes,
             user_entity=user
-            # Atribui as categorias processadas
-            # categories = categories # Descomente se o modelo Service tiver o relacionamento categories definido
         )
+        
+        # Associa as categorias ao serviço
+        service.categories = categories
 
         db.session.add(service)
-        # Se adicionou novas categorias acima, elas também serão salvas aqui
         db.session.commit()
+        
         return jsonify(service.to_dict()), 201
 
     except Exception as e:
         db.session.rollback()
         print(f"Erro na criação do serviço: {e}")
-        # O erro 422 pode ser lançado aqui se a validação do SQLAlchemy falhar
-        # Por exemplo, se time_chronos não for um inteiro válido, ou se o relacionamento user_entity for inválido
         return jsonify({"error": f"Erro interno ao criar o serviço: {str(e)}"}), 500
 
 @service_bp.route('/get/<int:service_id>', methods=['GET'])

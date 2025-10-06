@@ -86,12 +86,20 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // Monta o payload (sem categorias por enquanto)
+        // COLETA AS CATEGORIAS DAS TAGS
+        const categoryElements = document.querySelectorAll('#category-tag-list .tag');
+        const categories = Array.from(categoryElements).map(tag => {
+            // Pega o texto da tag (removendo o × do botão de remover)
+            const categoryName = tag.textContent.replace('×', '').trim();
+            return { name: categoryName };
+        });
+
+        // Monta o payload COM CATEGORIAS
         const payload = {
             title,
             description,
             timeChronos,
-            categoryEntities: [], // ← Array vazio temporariamente
+            categoryEntities: categories,  // AGORA COM DADOS REAIS
             serviceImage: serviceImageBase64
         };
 

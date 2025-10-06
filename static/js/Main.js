@@ -132,27 +132,29 @@ document.addEventListener("DOMContentLoaded", function () {
             // A imagem vem em Base64 do backend Flask
             const base64Image = `data:image/png;base64,${servico.serviceImage}`;
 
-            // console.log(servico); // Útil para debug
-
             // Monta o HTML do card do serviço
             card.innerHTML = `
-            <img src="${base64Image}" alt="Imagem do Serviço" class="service-image">
-            <div class="service-info">
-                <p class="service-title">${servico.title}</p>
-                <p class="user-service">Postado por ${servico.userEntity.name}</p>
-                <div class="qty-chronos-service">
-                    <img class="qty-chronos-service-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="Chronos Icon">
-                    <p class="qty-chronos-service-text">${servico.timeChronos} chronos</p>
-                </div>
-                <div class="categories-service">
-                    <!-- Categorias não implementadas no backend Flask ainda, exemplo estático -->
-                    <div class="category-service">
-                        <img class="category-service-img" src="{{ url_for('static', filename='img/Paintbrush.png') }}" alt="Category Icon">
-                        <p class="category-service-text">Exemplo</p>
+                <img src="${base64Image}" alt="Imagem do Serviço" class="service-image">
+                <div class="service-info">
+                    <p class="service-title">${servico.title}</p>
+                    <p class="user-service">Postado por ${servico.userEntity.name}</p>
+                    <div class="qty-chronos-service">
+                        <img class="qty-chronos-service-img" src="/static/img/Coin.png" alt="Chronos Icon">
+                        <p class="qty-chronos-service-text">${servico.timeChronos} chronos</p>
+                    </div>
+                    <div class="categories-service">
+                        ${servico.categoryEntities && servico.categoryEntities.length > 0 
+                            ? servico.categoryEntities.map(cat => `
+                                <div class="category-service">
+                                    <img class="category-service-img" src="/static/img/Paintbrush.png" alt="Category Icon">
+                                    <p class="category-service-text">${cat.name}</p>
+                                </div>
+                            `).join('')
+                            : '<p class="category-service-text">Sem categorias</p>'
+                        }
                     </div>
                 </div>
-            </div>
-        `;
+            `;
 
             requestsContainer.appendChild(card);
         });

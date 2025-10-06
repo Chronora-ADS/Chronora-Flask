@@ -83,27 +83,28 @@ class User(db.Model):
         if include_document and self.document:
             user_dict['document'] = self.document.to_dict()
         return user_dict
+# Tabela associativa para relacionamento Service-Category
+service_categories = db.Table('service_categories',
+    db.Column('service_id', db.Integer, db.ForeignKey('services.id'), primary_key=True),
+    db.Column('category_id', db.Integer, db.ForeignKey('categories.id'), primary_key=True)
+)
 
-# Modelo para Serviço
+# No modelo Service, descomente e ajuste o relacionamento:
 class Service(db.Model):
     __tablename__ = 'services'
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.Text, nullable=False) # Texto longo
+    description = db.Column(db.Text, nullable=False)
     time_chronos = db.Column(db.Integer, nullable=False)
-    service_image = db.Column(db.LargeBinary, nullable=False) # Dados binários da imagem
-
-    # Relacionamento com Usuário (um serviço pertence a um usuário)
+    service_image = db.Column(db.LargeBinary, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user_entity = db.relationship('User', back_populates='services')
 
-    # Relacionamento com Categorias (um serviço pode ter muitas categorias)
-    # categories = db.relationship('Category', secondary='service_categories', back_populates='services')
+    # Relacionamento com Categorias (AGORA ATIVADO)
+    categories = db.relationship('Category', secondary=service_categories, backref='services')
 
     def to_dict(self):
-        """Converte o objeto Service para um dicionário."""
-        # Converte a imagem para Base64 para envio via JSON
         image_base64 = base64.b64encode(self.service_image).decode('utf-8') if self.service_image else None
         
         return {
@@ -116,5 +117,7 @@ class Service(db.Model):
                 'id': self.user_entity.id,
                 'name': self.user_entity.name,
                 'email': self.user_entity.email
-            }
+            },
+            # Inclui categorias no retorno
+            'categoryEntities': [{'id': cat.id, 'name': cat.name} for cat in self.categories]
         }
