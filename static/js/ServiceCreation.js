@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- Manipulação do envio do formulário ---
-    document.getElementById('register-form').addEventListener('submit', async function (e) {
+     document.getElementById('register-form').addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const title = document.getElementById('input-title').value.trim();
@@ -48,82 +48,96 @@ document.addEventListener("DOMContentLoaded", function () {
         const imageInput = document.getElementById('input-service-image');
         const file = imageInput.files[0];
 
-        // Validação simples
+        // Validação
         if (!title || !description || !timeChronosStr) {
-             alert("Título, descrição e tempo em Chronos são obrigatórios.");
-             return;
+            alert("Título, descrição e tempo em Chronos são obrigatórios.");
+            return;
         }
 
         const timeChronos = parseInt(timeChronosStr);
         if (isNaN(timeChronos) || timeChronos <= 0) {
-             alert("Tempo em Chronos deve ser um número positivo.");
-             return;
+            alert("Tempo em Chronos deve ser um número positivo.");
+            return;
         }
 
         if (!file) {
-             alert("Selecione uma imagem para o serviço.");
-             return;
+            alert("Selecione uma imagem para o serviço.");
+            return;
         }
 
-        // Pega as categorias adicionadas como tags
-        const categories = Array.from(document.querySelectorAll('#category-tag-list .tag')).map(tag => ({
-            name: tag.innerText.trim().replace("×", "") // Remove o 'x' da tag
-        }));
+        // Obtém o user_id do localStorage
+        const userId = localStorage.getItem("user_id");
+        if (!userId) {
+            alert("Você precisa estar logado para criar um serviço.");
+            window.location.href = "http://127.0.0.1:5000/login";
+            return;
+        }
 
-        // Converte a imagem para Base64
-        let documentBase64 = "";
+        // Converte a imagem para Base64 (MANTENHA o prefixo)
+        let serviceImageBase64 = "";
         try {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            await new Promise(resolve => reader.onload = resolve); // Espera carregar
-            documentBase64 = reader.result.split(',')[1]; // Extrai apenas Base64 puro (sem prefixo)
+            await new Promise(resolve => reader.onload = resolve);
+            serviceImageBase64 = reader.result; // ← Mantenha o Base64 completo
         } catch (err) {
             alert("Erro ao converter imagem para Base64.");
             console.error(err);
             return;
         }
 
-        // Monta o payload
+        // Monta o payload (sem categorias por enquanto)
         const payload = {
             title,
             description,
             timeChronos,
-            categoryEntities: categories, // Envia categorias como array de objetos
-            serviceImage: documentBase64
+            categoryEntities: [], // ← Array vazio temporariamente
+            serviceImage: serviceImageBase64
         };
 
-        // Obtem o token do localStorage
+        console.log("Payload enviado:", payload);
+
         const token = localStorage.getItem("auth_token");
         if (!token) {
-            alert("Você precisa estar logado para criar um serviço.");
-            window.location.href = "http://127.0.0.1:5000/login"; // Redireciona para login
+            alert("Token de autenticação não encontrado.");
+            window.location.href = "http://127.0.0.1:5000/login";
             return;
         }
 
         try {
-            // Envia para o backend Flask
-            const response = await fetch("http://127.0.0.1:5000/service/post/1", { // URL atualizada para Flask (user_id fixo para exemplo)
+            const response = await fetch(`http://127.0.0.1:5000/service/post/${userId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "Bearer " + token // Envia o token JWT
+                    "Authorization": "Bearer " + token
                 },
                 body: JSON.stringify(payload)
             });
 
             if (response.ok) {
                 alert("Serviço criado com sucesso!");
-                window.location.href = "http://127.0.0.1:5000/"; // Redireciona para a página principal no Flask
+                window.location.href = "http://127.0.0.1:5000/";
             } else {
-                if (response.status === 401) {
+                let errorMessage = "Erro desconhecido ao criar serviço.";
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || errorMessage;
+                } catch (jsonError) {
+                    try {
+                        errorMessage = await response.text();
+                    } catch (textError) {
+                        console.error("Erro ao ler resposta:", textError);
+                    }
+                }
+                
+                if (response.status === 401 || response.status === 422) {
                     alert("Sessão expirada. Faça login novamente.");
                     localStorage.removeItem("auth_token");
+                    localStorage.removeItem("user_id");
                     window.location.href = "http://127.0.0.1:5000/login";
-                    return;
+                } else {
+                    alert(`Erro ${response.status}: ${errorMessage}`);
                 }
-                const errorData = await response.json().catch(() => ({})); // Tenta parse JSON de erro
-                const errorMessage = errorData.error || await response.text(); // Usa mensagem JSON ou texto
-                alert("Erro ao criar serviço: " + errorMessage);
             }
         } catch (err) {
             alert("Falha na comunicação com o servidor.");

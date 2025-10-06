@@ -97,14 +97,25 @@ document.addEventListener("DOMContentLoaded", function () {
             "Authorization": "Bearer " + token // Envia o token JWT
         }
     })
-    .then(response => {
+    .then(async response => {
         if (!response.ok) {
+            // Tenta ler a mensagem de erro do backend
+            let errorMsg = `Erro HTTP: ${response.status}`;
+            try {
+                const errorBody = await response.json();
+                errorMsg = errorBody.error || JSON.stringify(errorBody);
+            } catch (e) {
+                // Se não for JSON, lê como texto
+                errorMsg = await response.text();
+            }
+
             if (response.status === 401) {
                 alert("Sessão expirada. Faça login novamente.");
                 localStorage.removeItem("auth_token");
-                window.location.href = "http://127.0.0.1:5000/login"; // Redireciona para login
+                localStorage.removeItem("user_id");
+                window.location.href = "http://127.0.0.1:5000/login";
             }
-            throw new Error("Erro ao carregar os serviços: " + response.status);
+            throw new Error(errorMsg); // Lança erro com a mensagem do servidor
         }
         return response.json();
     })
@@ -125,29 +136,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Monta o HTML do card do serviço
             card.innerHTML = `
-                <img src="${base64Image}" alt="Imagem do Serviço" class="service-image">
-                <div class="service-info">
-                    <p class="service-title">${servico.title}</p>
-                    <p class="user-service">Postado por ${servico.userEntity.name}</p>
-                    <div class="qty-chronos-service">
-                        <img class="qty-chronos-service-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="Chronos Icon">
-                        <p class="qty-chronos-service-text">${servico.timeChronos} chronos</p>
-                    </div>
-                    <div class="categories-service">
-                        <!-- Categorias não implementadas no backend Flask ainda, exemplo estático -->
-                        <div class="category-service">
-                            <img class="category-service-img" src="{{ url_for('static', filename='img/Paintbrush.png') }}" alt="Category Icon">
-                            <p class="category-service-text">Exemplo</p>
-                        </div>
+            <img src="${base64Image}" alt="Imagem do Serviço" class="service-image">
+            <div class="service-info">
+                <p class="service-title">${servico.title}</p>
+                <p class="user-service">Postado por ${servico.userEntity.name}</p>
+                <div class="qty-chronos-service">
+                    <img class="qty-chronos-service-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="Chronos Icon">
+                    <p class="qty-chronos-service-text">${servico.timeChronos} chronos</p>
+                </div>
+                <div class="categories-service">
+                    <!-- Categorias não implementadas no backend Flask ainda, exemplo estático -->
+                    <div class="category-service">
+                        <img class="category-service-img" src="{{ url_for('static', filename='img/Paintbrush.png') }}" alt="Category Icon">
+                        <p class="category-service-text">Exemplo</p>
                     </div>
                 </div>
-            `;
+            </div>
+        `;
 
             requestsContainer.appendChild(card);
         });
     })
     .catch(error => {
-        console.error("Erro ao carregar serviços:", error);
-        requestsContainer.innerHTML = "<p>Falha ao carregar os serviços.</p>";
+        console.error("Erro completo ao carregar serviços:", error);
+        // Exibe a mensagem de erro específica no console
+        requestsContainer.innerHTML = `<p>Falha ao carregar os serviços. Detalhes: ${error.message}</p>`;
     });
 });

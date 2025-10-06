@@ -22,9 +22,10 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             if (response.ok) {
-                const token = await response.text(); // Flask retorna o token como texto puro
-                localStorage.setItem("auth_token", token); // Armazena o token
-                window.location.href = "http://127.0.0.1:5000/"; // Redireciona para a página principal no Flask
+                const data = await response.json();
+                localStorage.setItem("auth_token", data.access_token);
+                localStorage.setItem("user_id", data.user_id); 
+                window.location.href = "http://127.0.0.1:5000/";
             } else {
                 const errorData = await response.json().catch(() => ({})); // Tenta parse JSON de erro
                 const errorMessage = errorData.error || await response.text(); // Usa mensagem JSON ou texto

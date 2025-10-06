@@ -4,14 +4,15 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 import os
+from datetime import timedelta
 
 app = Flask(__name__) # Cria a instância do aplicativo Flask
 
 # --- Configurações ---
-app.config['SECRET_KEY'] = 'sua_chave_secreta_muito_forte_aqui'
+app.config['SECRET_KEY'] = 'segredo-muito-fortissimo-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-mesmo'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///chronora.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'sua_chave_jwt_muito_forte_aqui'
+app.config['JWT_SECRET_KEY'] = 'segredo-muito-fortissimo-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-mesmo'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
 # --- Inicialização de extensões ---

@@ -1,5 +1,5 @@
 # models.py
-from app import db # Importa a instância do SQLAlchemy do app.py
+from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 import base64
 
@@ -11,9 +11,11 @@ class Document(db.Model):
     name = db.Column(db.String(255), nullable=False) # Nome do arquivo
     type = db.Column(db.String(100), nullable=False) # Tipo MIME (ex: image/png)
     data = db.Column(db.LargeBinary, nullable=False) # Dados binários do arquivo
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) # Chave estrangeira
+    # Chave estrangeira para o usuário proprietário do documento
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    user = db.relationship('User', back_populates='document') # Relacionamento com User
+    # Relacionamento com User (muitos Documentos pertencem a um User)
+    user = db.relationship('User', back_populates='document')
 
     def to_dict(self):
         """Converte o objeto Document para um dicionário."""
@@ -52,8 +54,10 @@ class User(db.Model):
     roles = db.Column(db.JSON, default=['user']) # Armazena como JSON
 
     # Relacionamento com Documento (um usuário tem um documento)
-    document_id = db.Column(db.Integer, db.ForeignKey('documents.id'))
-    document = db.relationship('Document', back_populates='user', uselist=False)
+    # A chave estrangeira está em Document, não aqui em User.
+    # Usamos 'foreign_keys' para especificar qual FK usar no relacionamento unidirecional ou bidirecional
+    # 'uselist=False' indica que é um relacionamento um-para-um (um usuário tem um documento)
+    document = db.relationship('Document', back_populates='user', uselist=False, foreign_keys='Document.user_id')
 
     # Relacionamento com Serviços criados (um usuário pode criar muitos serviços)
     services = db.relationship('Service', back_populates='user_entity')
@@ -101,12 +105,16 @@ class Service(db.Model):
         """Converte o objeto Service para um dicionário."""
         # Converte a imagem para Base64 para envio via JSON
         image_base64 = base64.b64encode(self.service_image).decode('utf-8') if self.service_image else None
+        
         return {
             'id': self.id,
             'title': self.title,
             'description': self.description,
             'timeChronos': self.time_chronos,
             'serviceImage': image_base64,
-            'userEntity': self.user_entity.to_dict() # Inclui dados do usuário associado
-            # 'categoryEntities': [cat.to_dict() for cat in self.categories] # Se usar categorias
+            'userEntity': {
+                'id': self.user_entity.id,
+                'name': self.user_entity.name,
+                'email': self.user_entity.email
+            }
         }
