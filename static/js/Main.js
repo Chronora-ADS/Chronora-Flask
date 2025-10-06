@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("Sessão expirada. Faça login novamente.");
                 localStorage.removeItem("auth_token");
                 localStorage.removeItem("user_id");
-                window.location.href = "http://127.0.0.1:5000/login";
+                window.location.href = "http://127.0.0.1:5000/";
             }
             throw new Error(errorMsg); // Lança erro com a mensagem do servidor
         }

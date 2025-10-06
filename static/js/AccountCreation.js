@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (response.ok) {
                 alert("Cadastro realizado com sucesso!");
-                window.location.href = "http://127.0.0.1:5000/login"; // Redireciona para login no Flask
+                window.location.href = "http://127.0.0.1:5000/"; // Redireciona para login no Flask
             } else {
                 const errorData = await response.json().catch(() => ({})); // Tenta parse JSON de erro
                 const errorMessage = errorData.error || await response.text(); // Usa mensagem JSON ou texto

@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const userId = localStorage.getItem("user_id");
         if (!userId) {
             alert("Você precisa estar logado para criar um serviço.");
-            window.location.href = "http://127.0.0.1:5000/login";
+            window.location.href = "http://127.0.0.1:5000/";
             return;
         }
 
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const token = localStorage.getItem("auth_token");
         if (!token) {
             alert("Token de autenticação não encontrado.");
-            window.location.href = "http://127.0.0.1:5000/login";
+            window.location.href = "http://127.0.0.1:5000/";
             return;
         }
 
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (response.ok) {
                 alert("Serviço criado com sucesso!");
-                window.location.href = "http://127.0.0.1:5000/";
+                window.location.href = "http://127.0.0.1:5000/home";
             } else {
                 let errorMessage = "Erro desconhecido ao criar serviço.";
                 try {
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     alert("Sessão expirada. Faça login novamente.");
                     localStorage.removeItem("auth_token");
                     localStorage.removeItem("user_id");
-                    window.location.href = "http://127.0.0.1:5000/login";
+                    window.location.href = "http://127.0.0.1:5000/";
                 } else {
                     alert(`Erro ${response.status}: ${errorMessage}`);
                 }

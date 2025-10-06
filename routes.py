@@ -59,7 +59,7 @@ def register():
         print(f"Erro no registro: {e}")
         return jsonify({"error": "Erro interno ao processar o cadastro."}), 500
 
-@auth_bp.route('/login', methods=['POST'])
+@auth_bp.route('/', methods=['POST'])
 def login():
     data = request.get_json()
     email = data.get('email', '').strip()

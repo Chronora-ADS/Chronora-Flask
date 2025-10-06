@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const data = await response.json();
                 localStorage.setItem("auth_token", data.access_token);
                 localStorage.setItem("user_id", data.user_id); 
-                window.location.href = "http://127.0.0.1:5000/";
+                window.location.href = "http://127.0.0.1:5000/home";
             } else {
                 const errorData = await response.json().catch(() => ({})); // Tenta parse JSON de erro
                 const errorMessage = errorData.error || await response.text(); // Usa mensagem JSON ou texto

@@ -33,11 +33,11 @@ app.register_blueprint(user_bp) # Registra as rotas de user
 # --- Rotas para servir páginas HTML ---
 @app.route('/') # Rota raiz
 def main_page():
-    return render_template('Main.html') # Renderiza Main.html do diretório templates/
+    return render_template('Login.html') # Renderiza Main.html do diretório templates/
 
-@app.route('/login')
+@app.route('/home')
 def login_page():
-    return render_template('Login.html')
+    return render_template('Main.html')
 
 @app.route('/register') # ou /account_creation
 def register_page():
