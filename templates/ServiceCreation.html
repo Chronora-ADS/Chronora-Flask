@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/ServiceCreation.css') }}">
+    <!-- Atualiza os caminhos para usar a função url_for do Flask -->
     <title>Chronora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ServiceCreation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
 </head>
 <body>
     <div id="container">
@@ -21,10 +22,10 @@
                 </div>
             </div>
             <div id="navbar-buttons">
-                <a class="navbar-a" href="{{ url_for('service_creation') }}"><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a> 
+                <a class="navbar-a" href="{{ url_for('service_creation_page') }}"><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a>
                 <div id="qty-chronos">
                     <img id="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
-                    <p id="qty-chronos-text">123</p>
+                    <p id="qty-chronos-text">123</p> <!-- Valor fixo ou dinâmico -->
                 </div>
                 <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Briefcase.png') }}" alt=""></a>
                 <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Profile.png') }}" alt=""></a>
@@ -61,14 +62,15 @@
                     Imagem do Pedido
                     <img src="{{ url_for('static', filename='img/AddImage.png') }}" alt="" id="icon-service-image">
                 </button>
-                <!-- <span id="service-image-chosen"></span> -->
+                <span id="service-image-chosen"></span> <!-- Elemento para mostrar o nome da imagem -->
 
                 <div id="bottom-btns">
-                    <a href="{{ url_for('main_page') }}" id="a-cancel"><button id="btn-cancel">Cancelar</button></a> 
+                    <a href="{{ url_for('main_page') }}" id="a-cancel"><button id="btn-cancel">Cancelar</button></a> <!-- Link para Página Principal Flask -->
                     <button type="submit" id="btn-register">Criar Pedido</button>
                 </div>
             </form>
         </div>
+        <!-- Atualiza o caminho do script JS -->
         <script src="{{ url_for('static', filename='js/ServiceCreation.js') }}"></script>
     </div>
 </body>

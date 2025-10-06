@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/AccountCreation.css') }}">
     <title>Criação de conta</title>
+    <!-- Atualiza os caminhos para usar a função url_for do Flask -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/AccountCreation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
 </head>
 <body>
     <div id="container">
@@ -38,13 +39,14 @@
                     Documento com foto
                     <img src="{{ url_for('static', filename='img/Import.png') }}" alt="" id="icon-import">
                 </button>
-                <!-- <span id="file-chosen"></span> -->
+                <span id="file-chosen"></span> <!-- Elemento para mostrar o nome do arquivo -->
 
                 <button type="submit" id="btn-register">Criar Conta</button>
             </form>
-            <a href="{{ url_for('login') }}" id="a-login"><button id="btn-login">Entrar</button></a> <!-- Changed href to Flask route -->
+            <a href="{{ url_for('login_page') }}" id="a-login"><button id="btn-login">Entrar</button></a> <!-- Link para Login Flask -->
         </div>
     </div>
+    <!-- Atualiza o caminho do script JS -->
     <script src="{{ url_for('static', filename='js/AccountCreation.js') }}"></script>
 </body>
 </html>

@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}"> 
+    <!-- Atualiza os caminhos para usar a função url_for do Flask -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/Main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
     <title>Página Inicial</title>
 </head>
 <body>
@@ -21,10 +22,10 @@
                 </div>
             </div>
             <div id="navbar-buttons">
-                <a class="navbar-a" href="{{ url_for('service_creation') }}"><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a> 
+                <a class="navbar-a" href="{{ url_for('service_creation_page') }}"><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a>
                 <div class="qty-chronos">
                     <img class="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
-                    <p class="qty-chronos-text">123</p>
+                    <p class="qty-chronos-text">123</p> <!-- Valor fixo ou dinâmico -->
                 </div>
                 <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Briefcase.png') }}" alt=""></a>
                 <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Profile.png') }}" alt=""></a>
@@ -40,7 +41,7 @@
                 <div id="makerequest-content">
                     <h3>As horas acumuladas no seu banco representam oportunidades reais de ação.</h3>
                     <div id="makerequest-btn">
-                        <a id="add-service-a" href="{{ url_for('service_creation') }}">Faça um pedido<img src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a> 
+                        <a id="add-service-a" href="{{ url_for('service_creation_page') }}">Faça um pedido<img src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a> <!-- Link para Criação de Serviço Flask -->
                     </div>
                     <h3>Ou realize o de alguém</h3>
                     <img src="{{ url_for('static', filename='img/White Lines.png') }}" alt="" id="white-lines">
@@ -81,10 +82,10 @@
                         </select>
                     </div>
                 </div>
-            <div id="requests"></div>
+            <div id="requests"></div> <!-- Aqui os cards de serviço serão inseridos pelo JS -->
         </div>
     </div>
-    <script src="{{ url_for('static', filename='js/AccountCreation.js') }}"></script> 
+    <!-- Atualiza os caminhos dos scripts JS -->
     <script src="{{ url_for('static', filename='js/Main.js') }}"></script>
 </body>
 </html>

@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/Login.css') }}">
     <title>Página de Login</title>
+    <!-- Atualiza os caminhos para usar a função url_for do Flask -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
 </head>
 <body>
     <div id="container">
@@ -29,15 +30,16 @@
                 <div id="bottom-inputs-container">
                     <input type="checkbox" name="remember-me" id="checkbox-remeber-me" class="checkbox">
                     <label for="checkbox-remeber-me">Lembre-se de mim</label>
-                    <a href="{{ url_for('forgot_password') }}" id="a-forgot-password">Esqueceu a senha?</a> 
+                    <a href="#" id="a-forgot-password">Esqueceu a senha?</a> <!-- Link temporário -->
                 </div>
 
                 <button type="submit" id="btn-login">Entrar</button>
             </form>
 
-            <a href="{{ url_for('account_creation') }}" id="a-register"><button id="btn-register">Criar Conta</button></a> 
+            <a href="{{ url_for('register_page') }}" id="a-register"><button id="btn-register">Criar Conta</button></a> <!-- Link para Registro Flask -->
         </div>
     </div>
+    <!-- Atualiza o caminho do script JS -->
     <script src="{{ url_for('static', filename='js/Login.js') }}"></script>
 </body>
 </html>
