@@ -1,51 +1,66 @@
 # app.py
-from flask import Flask, render_template # Importa Flask e função para renderizar templates
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
-import os
 from datetime import timedelta
 
-app = Flask(__name__) # Cria a instância do aplicativo Flask
+# Cria as extensões PRIMEIRO
+db = SQLAlchemy()
+migrate = Migrate()
+jwt = JWTManager()
 
-# --- Configurações ---
-app.config['SECRET_KEY'] = 'segredo-muito-fortissimo-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-mesmo'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///chronora.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'segredo-muito-fortissimo-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-muito-mesmo'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+def create_app():
+    app = Flask(__name__)
+    
+    # Configurações
+    app.config['SECRET_KEY'] = 'segredo-muito-fortissimo'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chronora.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_SECRET_KEY'] = 'segredo-jwt-muito-fortissimo'
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
-# --- Inicialização de extensões ---
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-jwt = JWTManager(app)
+    # Inicializa extensões
+    db.init_app(app)
+    migrate.init_app(app, db)
+    jwt.init_app(app)
 
-# --- Importar modelos e rotas após a inicialização ---
-# Isso evita problemas de importação circular
-from models import User, Service, Category, Document
-from routes import auth_bp, service_bp, user_bp
+    # Importa e registra blueprints DENTRO da função
+    from routes import auth_bp, service_bp, user_bp
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(service_bp)
+    app.register_blueprint(user_bp)
 
-# --- Registrar Blueprints ---
-app.register_blueprint(auth_bp) # Registra as rotas de auth
-app.register_blueprint(service_bp) # Registra as rotas de service
-app.register_blueprint(user_bp) # Registra as rotas de user
+    # Rotas básicas
+    @app.route('/')
+    def login_page():
+        return render_template('Login.html')
 
-# --- Rotas para servir páginas HTML ---
-@app.route('/') # Rota raiz
-def main_page():
-    return render_template('Login.html') # Renderiza Main.html do diretório templates/
+    @app.route('/home')
+    def main_page():
+        return render_template('Main.html')
 
-@app.route('/home')
-def login_page():
-    return render_template('Main.html')
+    @app.route('/register')
+    def register_page():
+        return render_template('AccountCreation.html')
 
-@app.route('/register') # ou /account_creation
-def register_page():
-    return render_template('AccountCreation.html')
+    @app.route('/service_creation')
+    def service_creation_page():
+        return render_template('ServiceCreation.html')
 
-@app.route('/service_creation')
-def service_creation_page():
-    return render_template('ServiceCreation.html')
+    @app.route('/service_details/<int:service_id>')
+    def service_details_page(service_id):
+        return render_template('ServiceDetails.html')
+    
+    @app.route('/test')
+    def test():
+        return "✅ Flask funcionando!"
+
+    return app
+
+# Cria a aplicação
+app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    print("🚀 Iniciando Chronora Flask...")
+    app.run(debug=True, port=5000)

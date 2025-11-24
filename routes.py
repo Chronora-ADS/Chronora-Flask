@@ -1,19 +1,17 @@
 # routes.py
-from flask import Blueprint, request, jsonify, render_template_string
-from app import db
-from models import User, Service, Category, Document
+from flask import Blueprint, request, jsonify
+from models import db, User, Service, Category, Document
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 import base64
 import re
 
-# --- Blueprints ---
-# Usamos Blueprints para organizar as rotas em grupos lógicos
+# Blueprints
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 service_bp = Blueprint('service', __name__, url_prefix='/service')
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 
-# --- Rotas de Autenticação ---
+# Rotas de Autenticação
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -24,7 +22,6 @@ def register():
     confirm_password = data.get('confirmPassword', '')
     document_base64 = data.get('document', '')
 
-    # --- Validações ---
     if not name or not email or not phone_number_str or not password or not confirm_password:
         return jsonify({"error": "Todos os campos são obrigatórios."}), 400
     if password != confirm_password:
@@ -43,7 +40,6 @@ def register():
     if User.query.filter_by(phone_number=phone_number).first():
         return jsonify({"error": "Número de celular já registrado."}), 409
 
-    # --- Processamento ---
     try:
         document_bytes = base64.b64decode(document_base64.split(',')[1] if ',' in document_base64 else document_base64)
         document = Document(name="foto.png", type="image/png", data=document_bytes)
@@ -52,14 +48,14 @@ def register():
         user.document = document
         db.session.add(user)
         db.session.commit()
-        return jsonify(user.to_dict(include_document=False)), 201 # Retorna dados do usuário criado
+        return jsonify(user.to_dict(include_document=False)), 201
 
     except Exception as e:
         db.session.rollback()
         print(f"Erro no registro: {e}")
         return jsonify({"error": "Erro interno ao processar o cadastro."}), 500
 
-@auth_bp.route('/', methods=['POST'])
+@auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     email = data.get('email', '').strip()
@@ -81,10 +77,9 @@ def login():
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
 def logout():
-    # Implementação de blacklist de token aqui, se necessário
     return jsonify({"message": "Logout realizado com sucesso."}), 200
 
-# --- Rotas de Serviço ---
+# Rotas de Serviço
 @service_bp.route('/post/<int:user_id>', methods=['POST'])
 @jwt_required()
 def create_service(user_id):
@@ -96,7 +91,7 @@ def create_service(user_id):
     title = data.get('title', '').strip()
     description = data.get('description', '').strip()
     time_chronos = data.get('timeChronos')
-    category_entities_data = data.get('categoryEntities', [])  # AGORA ATIVADO
+    category_entities_data = data.get('categoryEntities', [])
     service_image_base64 = data.get('serviceImage', '')
 
     if not title or not description or time_chronos is None or not service_image_base64:
@@ -109,18 +104,14 @@ def create_service(user_id):
     try:
         image_bytes = base64.b64decode(service_image_base64.split(',')[1] if ',' in service_image_base64 else service_image_base64)
 
-        # --- PROCESSAMENTO DE CATEGORIAS (AGORA ATIVADO) ---
         categories = []
         for cat_data in category_entities_data:
             cat_name = cat_data.get('name', '').strip()
             if cat_name:
-                # Busca categoria existente (case-insensitive)
                 category = Category.query.filter(db.func.lower(Category.name) == db.func.lower(cat_name)).first()
                 if not category:
-                    # Se não existir, cria uma nova
                     category = Category(name=cat_name)
                     db.session.add(category)
-                    # Commit parcial para gerar ID
                     db.session.flush()
                 categories.append(category)
 
@@ -132,7 +123,6 @@ def create_service(user_id):
             user_entity=user
         )
         
-        # Associa as categorias ao serviço
         service.categories = categories
 
         db.session.add(service)
@@ -146,6 +136,7 @@ def create_service(user_id):
         return jsonify({"error": f"Erro interno ao criar o serviço: {str(e)}"}), 500
 
 @service_bp.route('/get/<int:service_id>', methods=['GET'])
+@jwt_required(optional=True)
 def get_service_by_id(service_id):
     service = Service.query.get(service_id)
     if service:
@@ -156,14 +147,46 @@ def get_service_by_id(service_id):
 @service_bp.route('/get/all', methods=['GET'])
 @jwt_required()
 def get_all_services():
-    current_user_id = get_jwt_identity()
-    print(f"Current user ID (raw): {current_user_id}")
-    print(f"Type of user ID: {type(current_user_id)}")
-    services = Service.query.all()
+    search = request.args.get('search', '').strip()
+    category = request.args.get('category', '').strip()
+    min_chronos = request.args.get('min_chronos', type=int)
+    max_chronos = request.args.get('max_chronos', type=int)
+    sort_by = request.args.get('sort_by', 'recent')
+    
+    query = Service.query
+    
+    if search:
+        query = query.filter(
+            db.or_(
+                Service.title.ilike(f'%{search}%'),
+                Service.description.ilike(f'%{search}%')
+            )
+        )
+    
+    if category:
+        query = query.join(Service.categories).filter(Category.name.ilike(f'%{category}%'))
+    
+    if min_chronos is not None:
+        query = query.filter(Service.time_chronos >= min_chronos)
+    
+    if max_chronos is not None:
+        query = query.filter(Service.time_chronos <= max_chronos)
+    
+    if sort_by == 'recent':
+        query = query.order_by(Service.id.desc())
+    elif sort_by == 'old':
+        query = query.order_by(Service.id.asc())
+    elif sort_by == 'chronos_high':
+        query = query.order_by(Service.time_chronos.desc())
+    elif sort_by == 'chronos_low':
+        query = query.order_by(Service.time_chronos.asc())
+    
+    services = query.all()
     services_data = [service.to_dict() for service in services]
+    
     return jsonify(services_data), 200
 
-# --- Rotas de Usuário ---
+# Rotas de Usuário
 @user_bp.route('/get/<int:user_id>', methods=['GET'])
 def get_user_by_id(user_id):
     user = User.query.get(user_id)

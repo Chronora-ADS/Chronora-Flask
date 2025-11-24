@@ -6,127 +6,57 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
-/* Formulário principal */
-#container-form {
-    position: relative;
-    z-index: 99;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 30%;
-    height: 65%;
-    min-height: fit-content;
-    background-color: var(--branco);
-    border-radius: 40px;
-    padding: 1%;
-}
-
-#register-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-/* Cabeçalho (repetido do Main, talvez deva ser um estilo global?) */
+/* Cabeçalho - LOGO CENTRALIZADA */
 #container-header {
     position: fixed;
     z-index: 100;
     top: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
     height: 7%;
-    padding-left: 2%;
-    padding-right: 2%;
     background-color: var(--amarelo-claro);
     box-sizing: border-box;
-}
-
-#icon-left,
-#search-bar,
-#navbar-buttons {
-    flex-shrink: 0;
 }
 
 #icon-left {
     display: flex;
     align-items: center;
-    width: 20%;
+    justify-content: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 2;
 }
 
 #icon-left-img {
-    height: 15%;
-    width: 15%;
+    height: 35px;
+    width: 35px;
+    margin-right: 10px;
 }
 
 #icon-left-text {
     font-size: 2rem;
     font-weight: bold;
     margin: 0;
-}
-
-#search-bar {
-    width: 40%;
-    display: flex;
-    align-items: center;
-}
-
-.search-container {
-    position: relative;
-    width: 100%;
-}
-
-.icon-search {
-    position: absolute;
-    right: -10px;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 50%;
-    width: auto;
-}
-
-#input-search-bar {
-    width: 100%;
-    padding-left: 35px;
-    border-radius: 10px;
-}
-
-#input-search-bar {
-    width: 100%;
-    border-radius: 10px;
-}
-
-#container-header input[type=text] {
-    font-size: 15px;
-    background: var(--branco);
-    border: 1px solid var(--branco-borda);
-    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-    padding: 10px;
-    margin: 5px;
-}
-
-#container-header input[type=text]::placeholder {
-    color: var(--texto-placeholder);
+    color: var(--preto);
 }
 
 #navbar-buttons {
-    width: 20%;
+    position: absolute;
+    right: 2%;
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: flex-end;
+    gap: 20px;
 }
 
 .navbar-a {
-    width: 10%;
-    height: 10%;
+    width: 30px;
+    height: 30px;
 }
 
 .navbar-buttons-img {
@@ -137,17 +67,67 @@
 #qty-chronos {
     display: flex;
     align-items: center;
-    gap: 1px;
-    width: 18%;
+    gap: 5px;
 }
 
 #qty-chronos-img {
-    width: 55%;
-    height: 100%;
+    width: 25px;
+    height: 25px;
 }
 
 #qty-chronos-text {
     font-weight: bold;
+    color: var(--preto);
+}
+
+/* BARRA DE PESQUISA ABAIXO DO HEADER */
+#search-section {
+    position: fixed;
+    top: 7%;
+    left: 0;
+    width: 100%;
+    background-color: var(--preto);
+    padding: 15px 0;
+    z-index: 99;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#search-container {
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-container {
+    position: relative;
+    width: 100%;
+}
+
+.icon-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 20px;
+    width: auto;
+    z-index: 2;
+}
+
+#input-search-bar {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border-radius: 10px;
+    font-size: 16px;
+    background: var(--branco);
+    border: 1px solid var(--branco-borda);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+#input-search-bar::placeholder {
+    color: var(--texto-placeholder);
 }
 
 /* Fundo decorativo */
@@ -181,8 +161,23 @@
     width: 15%;
 }
 
-/* Formulário */
-#login-form { /* Ajuste: O formulário é #register-form, mas esta regra existia no CSS original */
+/* Formulário principal - CENTRALIZADO */
+#container-form {
+    position: relative;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 30%;
+    min-height: 65%;
+    background-color: var(--branco);
+    border-radius: 40px;
+    padding: 30px;
+    margin: 10% auto 0; /* Compensa header + search e centraliza */
+}
+
+#register-form {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -191,7 +186,10 @@
 
 #container-form h1 {
     margin: 0;
-    margin-bottom: 5%;
+    margin-bottom: 30px;
+    color: var(--preto);
+    text-align: center;
+    font-size: 2rem;
 }
 
 /* Inputs do formulário */
@@ -199,13 +197,15 @@ input[type=text],
 input[type=number],
 textarea {
     outline: none;
-    font-size: 20px;
+    font-size: 16px;
     background: var(--branco);
     border: 1px solid var(--branco-borda);
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.25);
-    padding: 10px;
-    margin: 5px;
-    width: 75%;
+    padding: 12px;
+    margin: 8px 0;
+    width: 100%;
+    border-radius: 8px;
+    box-sizing: border-box;
 }
 
 input[type=text]::placeholder,
@@ -216,6 +216,7 @@ textarea::placeholder {
 
 textarea {
     resize: none;
+    min-height: 100px;
 }
 
 /* Container de categorias */
@@ -223,12 +224,13 @@ textarea {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: 75%;
-    padding: 10px;
-    margin: 5px;
+    width: 100%;
+    padding: 15px;
+    margin: 8px 0;
     background-color: var(--branco);
     border: 1px solid var(--branco-borda);
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
 }
 
 .input-with-tags {
@@ -237,6 +239,7 @@ textarea {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    gap: 8px;
 }
 
 .tag {
@@ -244,129 +247,98 @@ textarea {
     align-items: center;
     background: var(--amarelo-um-pouco-escuro);
     color: var(--branco);
-    padding: 5px 10px;
-    margin: 5px;
+    padding: 6px 12px;
+    border-radius: 15px;
     font-size: 14px;
 }
 
 .tag .remove-tag {
-    margin-left: 10px;
+    margin-left: 8px;
     cursor: pointer;
     font-weight: bold;
     color: #ffcccc;
 }
 
 #label-category {
-    font-size: 18px;
+    font-size: 16px;
     color: var(--texto-placeholder);
+    margin-bottom: 8px;
 }
 
 #input-category {
     outline: none;
-    font-size: 20px;
+    font-size: 16px;
     flex-grow: 1;
-    padding: 5px;
+    padding: 8px;
+    border: none;
+    background: transparent;
 }
 
 #input-category::placeholder {
     color: var(--texto-placeholder);
 }
 
-/* Container inferior com "Lembre-se de mim" e "Esqueceu a senha?" (Ajuste: Não está no HTML, mas existia no CSS original) */
-#bottom-inputs-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin: 5px 0;
-    padding: 10px;
-    width: 70%;
-}
-
-/* Estilo para o checkbox personalizado (Ajuste: Não está no HTML, mas existia no CSS original) */
-.checkbox {
-    position: absolute;
-    opacity: 0;
-    width: 1px;
-    height: 1px;
-}
-
-.checkbox + label {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    user-select: none;
-}
-
-.checkbox + label::before {
-    content: "";
-    background: url('../img/UncheckedCheckbox.png') no-repeat;
-    background-size: contain;
-    width: 30px;
-    height: 30px;
-    display: inline-block;
-}
-
-.checkbox:checked + label::before {
-    background-image: url('../img/CheckedCheckbox.png');
-}
-
 /* Botões */
 #btn-service-image, #btn-register, #btn-cancel {
     display: flex;
     align-items: center;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: bold;
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.25);
     position: relative;
     cursor: pointer;
-    padding: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    width: 100%;
+    justify-content: center;
+    margin: 8px 0;
 }
 
 #btn-service-image {
-    padding-left: 20px;
-    padding-right: 0; /* garante borda direita limpa */
-    width: 79%;
     background: var(--branco);
     color: var(--amarelo-um-pouco-escuro);
     border: 3px solid var(--amarelo-um-pouco-escuro);
     justify-content: space-between;
 }
 
+#btn-service-image:hover {
+    background: var(--amarelo-claro);
+}
+
 #btn-register {
-    width: 47%;
     background-color: var(--amarelo-um-pouco-escuro);
     color: var(--branco);
     border: none;
-    justify-content: center;
+}
+
+#btn-register:hover {
+    background-color: var(--amarelo-um-pouco-mais-escuro);
 }
 
 #btn-cancel {
-    width: 100%;
     background: var(--branco);
     color: var(--amarelo-um-pouco-escuro);
     border: 3px solid var(--amarelo-um-pouco-escuro);
-    justify-content: center;
+}
+
+#btn-cancel:hover {
+    background: var(--cinza);
 }
 
 /* Ícones e elementos auxiliares */
 #btn-service-image #icon-service-image {
-    width: 40px;
-    height: 40px;
-    margin-left: auto;
-    margin-right: 0;
-    padding: 0;
-    padding-right: 10px;
+    width: 30px;
+    height: 30px;
 }
 
 #service-image-chosen {
     font-size: 14px;
     color: #666;
-    margin-top: -10px;
-    margin-bottom: 20px;
+    margin-top: -5px;
+    margin-bottom: 15px;
     align-self: flex-start;
+    width: 100%;
 }
 
 #input-service-image {
@@ -377,13 +349,14 @@ textarea {
     text-decoration: none;
     cursor: pointer;
     position: relative;
-    width: 47%;
+    width: 48%;
 }
 
 #bottom-btns {
-    width: 79%;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 5%;
+    margin-top: 20px;
+    gap: 15px;
 }

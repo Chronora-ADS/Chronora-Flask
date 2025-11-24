@@ -1,0 +1,241 @@
+/* ServiceDetails.css */
+
+/* Layout principal */
+#container {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Cabeçalho - LOGO CENTRALIZADA */
+#container-header {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 7%;
+    background-color: var(--amarelo-claro);
+    box-sizing: border-box;
+}
+
+#icon-left {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+#icon-left-img {
+    height: 35px;
+    width: 35px;
+    margin-right: 10px;
+}
+
+#icon-left-text {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+    color: var(--preto);
+}
+
+#navbar-buttons {
+    position: absolute;
+    right: 2%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 20px;
+}
+
+.navbar-a {
+    width: 30px;
+    height: 30px;
+}
+
+.navbar-buttons-img {
+    width: 100%;
+    height: 100%;
+}
+
+.qty-chronos {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.qty-chronos-img {
+    width: 25px;
+    height: 25px;
+}
+
+.qty-chronos-text {
+    font-weight: bold;
+    color: var(--preto);
+}
+
+/* BARRA DE PESQUISA ABAIXO DO HEADER */
+#search-section {
+    position: fixed;
+    top: 7%;
+    left: 0;
+    width: 100%;
+    background-color: var(--preto);
+    padding: 15px 0;
+    z-index: 99;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#search-container {
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-container {
+    position: relative;
+    width: 100%;
+}
+
+.icon-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 20px;
+    width: auto;
+    z-index: 2;
+}
+
+#input-search-bar {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border-radius: 10px;
+    font-size: 16px;
+    background: var(--branco);
+    border: 1px solid var(--branco-borda);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+#input-search-bar::placeholder {
+    color: var(--texto-placeholder);
+}
+
+/* Container de detalhes do serviço - CENTRALIZADO */
+#service-details-container {
+    display: flex;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 120px auto 50px;
+    padding: 0 20px;
+    justify-content: center;
+}
+
+#service-image-section {
+    flex: 1;
+    max-width: 500px;
+    display: flex;
+    justify-content: center;
+}
+
+#service-main-image {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#service-info-section {
+    flex: 1;
+    max-width: 500px;
+    color: var(--branco);
+}
+
+#service-title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: var(--amarelo-claro);
+}
+
+#service-user-info {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+#service-chronos {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+#service-chronos img {
+    width: 30px;
+    height: 30px;
+}
+
+#service-description, #service-categories {
+    margin-bottom: 30px;
+}
+
+#service-description h3, #service-categories h3 {
+    color: var(--amarelo-claro);
+    margin-bottom: 10px;
+}
+
+#service-description-text {
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+#categories-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.category-tag {
+    background-color: var(--amarelo-claro);
+    color: var(--preto);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+#btn-contact, #btn-back {
+    background-color: var(--amarelo-um-pouco-escuro);
+    color: var(--branco);
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+#btn-contact:hover, #btn-back:hover {
+    background-color: var(--amarelo-um-pouco-mais-escuro);
+    transform: translateY(-2px);
+}
+
+#btn-back {
+    background-color: var(--cinza);
+}
+
+#btn-back:hover {
+    background-color: #9ca89a;
+}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Serviço - Chronora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ServiceDetails.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
+</head>
+<body>
+    <div id="container">
+        <!-- Header SEM barra de pesquisa -->
+        <div id="container-header">
+            <div id="icon-left">
+                <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
+                <p id="icon-left-text">Chronora</p>
+            </div>
+            <div id="navbar-buttons">
+                <a class="navbar-a" href="{{ url_for('service_creation_page') }}"><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a>
+                <div class="qty-chronos">
+                    <img class="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
+                    <p class="qty-chronos-text">123</p>
+                </div>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Briefcase.png') }}" alt=""></a>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Profile.png') }}" alt=""></a>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Settings.png') }}" alt=""></a>
+            </div>
+        </div>
+
+        <!-- BARRA DE PESQUISA ABAIXO DO HEADER -->
+        <div id="search-section">
+            <div id="search-container">
+                <div class="search-container">
+                    <input type="text" name="search-bar" placeholder="Pintura de parede, aula de inglês..." id="input-search-bar">
+                    <img src="{{ url_for('static', filename='img/Search.png') }}" alt="" class="icon-search">
+                </div>
+            </div>
+        </div>
+        
+        <div id="service-details-container">
+            <div id="service-image-section">
+                <img id="service-main-image" src="" alt="Imagem do Serviço">
+            </div>
+            <div id="service-info-section">
+                <h1 id="service-title"></h1>
+                <div id="service-user-info">
+                    <p>Postado por: <span id="service-author"></span></p>
+                </div>
+                <div id="service-chronos">
+                    <img src="{{ url_for('static', filename='img/Coin.png') }}" alt="Chronos">
+                    <span id="service-time-chronos"></span> chronos
+                </div>
+                <div id="service-description">
+                    <h3>Descrição</h3>
+                    <p id="service-description-text"></p>
+                </div>
+                <div id="service-categories">
+                    <h3>Categorias</h3>
+                    <div id="categories-list"></div>
+                </div>
+                <button id="btn-contact">Entrar em Contato</button>
+                <button id="btn-back" onclick="window.history.back()">Voltar</button>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/ServiceDetails.js') }}"></script>
+</body>
+</html>
