@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // --- Manipulação do envio do formulário ---
     document.getElementById('register-form').addEventListener('submit', async function (e) {
-        e.preventDefault(); // Impede o envio padrão do formulário
+        e.preventDefault();
 
         const name = document.getElementById('input-name').value.trim();
         const email = document.getElementById('input-email').value.trim();
@@ -22,17 +22,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const fileInput = document.getElementById('input-file');
 
-        // Validação simples
+        // Validação
         if (!name || !email || !phoneNumberStr || !password || !confirmPassword) {
             alert("Todos os campos são obrigatórios.");
             return;
         }
 
-        // Validação do número de telefone (remove não-dígitos e verifica comprimento)
         const phoneNumber = parseInt(phoneNumberStr.replace(/\D/g, ''));
-        if (isNaN(phoneNumber) || phoneNumber.toString().length < 10) { // Ajuste o comprimento conforme necessário
-             alert("Número de telefone inválido.");
-             return;
+        if (isNaN(phoneNumber) || phoneNumber.toString().length < 10) {
+            alert("Número de telefone inválido.");
+            return;
         }
 
         if (password.length < 6) {
@@ -60,19 +59,22 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // Monta o payload
+        // Extrai apenas a parte base64 (remove o prefixo data:image/...)
+        const base64Data = documentBase64.split(',')[1] || documentBase64;
+
+        // Monta o payload conforme esperado pelo Flask
         const payload = {
-            name,
-            email,
-            phoneNumber, // Envia o número como inteiro
-            password,
-            confirmPassword, // O backend Flask irá validar no lado do servidor
-            document: documentBase64
+            "name": name,
+            "email": email,
+            "phoneNumber": phoneNumber,
+            "password": password,
+            "confirmPassword": confirmPassword,
+            "document": base64Data  // Envia apenas a string base64
         };
 
         // Envia para o backend Flask
         try {
-            const response = await fetch("http://127.0.0.1:5000/auth/register", { // URL atualizada para Flask
+            const response = await fetch("http://localhost:5000/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -80,16 +82,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify(payload)
             });
 
+            const responseData = await response.json();
+
             if (response.ok) {
                 alert("Cadastro realizado com sucesso!");
-                window.location.href = "http://127.0.0.1:5000/"; // Redireciona para login no Flask
+                window.location.href = "/"; // Redireciona para login
             } else {
-                const errorData = await response.json().catch(() => ({})); // Tenta parse JSON de erro
-                const errorMessage = errorData.error || await response.text(); // Usa mensagem JSON ou texto
-                alert("Erro ao cadastrar: " + errorMessage);
+                alert("Erro ao cadastrar: " + (responseData.error || responseData.message || "Erro desconhecido"));
             }
         } catch (err) {
-            alert("Falha na comunicação com o servidor.");
+            alert("Falha na comunicação com o servidor: " + err.message);
             console.error(err);
         }
     });

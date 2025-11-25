@@ -12,8 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            // Envia para o backend Flask
-            const response = await fetch("http://127.0.0.1:5000/auth/login", { // URL atualizada para Flask
+            const response = await fetch("http://localhost:5000/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -21,18 +20,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify({ email, password })
             });
 
+            const data = await response.json();
+
             if (response.ok) {
-                const data = await response.json();
+                // Salva o token JWT
                 localStorage.setItem("auth_token", data.access_token);
-                localStorage.setItem("user_id", data.user_id); 
-                window.location.href = "http://127.0.0.1:5000/home";
+                localStorage.setItem("user_id", data.user_id);
+                
+                alert("Login realizado com sucesso!");
+                window.location.href = "/home";
             } else {
-                const errorData = await response.json().catch(() => ({})); // Tenta parse JSON de erro
-                const errorMessage = errorData.error || await response.text(); // Usa mensagem JSON ou texto
-                alert("Erro ao fazer login: " + errorMessage);
+                alert("Erro ao fazer login: " + (data.error || data.message || "Credenciais inválidas"));
             }
         } catch (err) {
-            alert("Falha na comunicação com o servidor.");
+            alert("Falha na comunicação com o servidor: " + err.message);
             console.error(err);
         }
     });

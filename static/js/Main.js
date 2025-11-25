@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const inputCategory = document.getElementById('input-category');
     const tagList = document.getElementById('category-tag-list');
 
-    if (inputCategory && tagList) { // Verifica se os elementos existem
+    if (inputCategory && tagList) {
         inputCategory.addEventListener('keydown', function (e) {
             if (e.key === 'Enter' && inputCategory.value.trim() !== "") {
                 e.preventDefault();
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         element.parentElement.remove();
     }
 
-    // Dados simulados de categorias (Flask não tem endpoint para isso ainda)
+    // Dados simulados de categorias
     const categorias = ["Pintura", "Mecânica", "Engenharia", "Elétrica"];
 
     function popularCategoriasDatalist() {
@@ -59,24 +59,21 @@ document.addEventListener("DOMContentLoaded", function () {
         const texto = val === 0 ? "0-5" : `${val - 5}-${val}`;
         tooltip.textContent = texto;
 
-        // Ajuste de posição do tooltip (pode precisar de ajustes finos)
         const sliderWidth = slider.offsetWidth;
-        const thumbWidth = 20; // Largura aproximada do thumb
+        const thumbWidth = 20;
         const pos = percent * (sliderWidth - thumbWidth) + (thumbWidth / 2);
 
-        tooltip.style.left = `calc(${pos}px - ${tooltip.offsetWidth / 2}px + 25px)`;
+        tooltip.style.left = calc(`${pos}px - ${tooltip.offsetWidth / 2}px + 25px`);
     }
 
     if (slider && tooltip) {
         slider.addEventListener("input", updateTooltip);
         window.addEventListener("resize", updateTooltip);
-        updateTooltip(); // Inicializa tooltip
+        updateTooltip();
     }
 
     // ----- FETCH DE SERVIÇOS -----
     const requestsContainer = document.getElementById("requests");
-    // URL atualizada para Flask
-    const apiUrl = "http://127.0.0.1:5000/service/get/all";
     const token = localStorage.getItem("auth_token");
 
     if (!requestsContainer) {
@@ -86,68 +83,67 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!token) {
         console.error("Token não encontrado no localStorage.");
-        requestsContainer.innerHTML = "<p>Você precisa estar logado para visualizar os serviços.</p>";
+        requestsContainer.innerHTML = "<p style='color: white;'>Você precisa estar logado para visualizar os serviços.</p>";
         return;
     }
 
     // Faz a requisição para o backend Flask
-    fetch(apiUrl, {
+    fetch("http://localhost:5000/service/get/all", {
         method: "GET",
         headers: {
-            "Authorization": "Bearer " + token // Envia o token JWT
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json"
         }
     })
     .then(async response => {
         if (!response.ok) {
-            // Tenta ler a mensagem de erro do backend
-            let errorMsg = `Erro HTTP: ${response.status}`;
-            try {
-                const errorBody = await response.json();
-                errorMsg = errorBody.error || JSON.stringify(errorBody);
-            } catch (e) {
-                // Se não for JSON, lê como texto
-                errorMsg = await response.text();
-            }
-
             if (response.status === 401) {
                 alert("Sessão expirada. Faça login novamente.");
                 localStorage.removeItem("auth_token");
                 localStorage.removeItem("user_id");
-                window.location.href = "http://127.0.0.1:5000/";
+                window.location.href = "/";
+                return;
             }
-            throw new Error(errorMsg); // Lança erro com a mensagem do servidor
+            throw new Error(`Erro HTTP: ${response.status}`);
         }
         return response.json();
     })
     .then(servicos => {
-        if (servicos.length === 0) {
-            requestsContainer.innerHTML = "<p>Nenhum serviço encontrado.</p>";
+        console.log("Serviços recebidos:", servicos);
+        
+        if (!servicos || servicos.length === 0) {
+            requestsContainer.innerHTML = "<p style='color: white;'>Nenhum serviço encontrado.</p>";
             return;
         }
+
+        requestsContainer.innerHTML = ""; // Limpa container
 
         servicos.forEach(servico => {
             const card = document.createElement("div");
             card.className = "service-card";
 
-            // A imagem vem em Base64 do backend Flask
-            const base64Image = `data:image/png;base64,${servico.serviceImage}`;
+            // Verifica se serviceImage existe e é uma string base64 válida
+            let imageSrc = "/static/img/default-service.png"; // Imagem padrão
+            if (servico.serviceImage && typeof servico.serviceImage === 'string') {
+                imageSrc = `data:image/png;base64,${servico.serviceImage}`;
+            }
 
             // Monta o HTML do card do serviço
             card.innerHTML = `
-                <img src="${base64Image}" alt="Imagem do Serviço" class="service-image">
+                <img src="${imageSrc}" alt="Imagem do Serviço" class="service-image">
                 <div class="service-info">
-                    <p class="service-title">${servico.title}</p>
-                    <p class="user-service">Postado por ${servico.userEntity.name}</p>
+                    <p class="service-title">${servico.title || 'Sem título'}</p>
+                    <p class="user-service">Postado por ${servico.userEntity?.name || 'Usuário desconhecido'}</p>
                     <div class="qty-chronos-service">
                         <img class="qty-chronos-service-img" src="/static/img/Coin.png" alt="Chronos Icon">
-                        <p class="qty-chronos-service-text">${servico.timeChronos} chronos</p>
+                        <p class="qty-chronos-service-text">${servico.timeChronos || 0} chronos</p>
                     </div>
                     <div class="categories-service">
                         ${servico.categoryEntities && servico.categoryEntities.length > 0 
                             ? servico.categoryEntities.map(cat => `
                                 <div class="category-service">
                                     <img class="category-service-img" src="/static/img/Paintbrush.png" alt="Category Icon">
-                                    <p class="category-service-text">${cat.name}</p>
+                                    <p class="category-service-text">${cat.name || 'Categoria'}</p>
                                 </div>
                             `).join('')
                             : '<p class="category-service-text">Sem categorias</p>'
@@ -161,7 +157,6 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .catch(error => {
         console.error("Erro completo ao carregar serviços:", error);
-        // Exibe a mensagem de erro específica no console
-        requestsContainer.innerHTML = `<p>Falha ao carregar os serviços. Detalhes: ${error.message}</p>`;
+        requestsContainer.innerHTML = <p style='color: white;'>Falha ao carregar os serviços: ${error.message}</p>;
     });
 });
