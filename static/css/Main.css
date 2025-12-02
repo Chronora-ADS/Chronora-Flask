@@ -76,11 +76,6 @@
     border-radius: 10px;
 }
 
-#input-search-bar {
-    width: 100%;
-    border-radius: 10px;
-}
-
 #container-header input[type=text] {
     font-size: 15px;
     background: var(--branco);
@@ -193,10 +188,10 @@
     text-align: center;
     font-size: 1.2rem;
     display: flex;
-    justify-content: center; /* Centraliza o conteúdo */
+    justify-content: center;
     align-items: center;
     width: 450px;
-    gap: 10px; /* Reduza o gap para aproximar texto e imagem */
+    gap: 10px;
     margin: 20px;
     text-decoration: none;
     color: var(--preto);
@@ -207,24 +202,109 @@
     width: 100%;
 }
 
+/* Grid dos filtros */
 #requests-filter {
     display: grid;
     grid-template-columns: repeat(4, 1fr); /* 4 colunas de tamanho igual */
     gap: 5%; /* Espaçamento entre cards */
     padding: 0;
     width: 100%;
+    align-items: start; /* Alinha os itens no topo */
 }
 
-/* Estilo do slider de tempo */
+/* Estilo dos itens de filtro - COM TAMANHO CONSISTENTE */
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Faz os filhos ocuparem toda a largura */
+    width: 100%;
+    height: auto;
+    min-height: 80px; /* Altura mínima para consistência */
+}
+
+.filter-item h3 {
+    padding-left: 10px;
+    width: 100%;
+    height: auto;
+    color: var(--branco);
+    margin-bottom: 10px; /* Espaço entre título e campo */
+    font-size: 16px;
+}
+
+/* ESTILOS UNIFICADOS PARA ALTURA DOS CAMPOS DE FILTRO */
+#filtro-avaliacao,
+#filtro-categorias,
+#filtro-ordenacao {
+    width: 100% !important;
+    height: 40px !important; /* Altura fixa para todos */
+    border: 1px solid var(--branco) !important;
+    border-radius: 20px !important;
+    background-color: var(--branco) !important;
+    box-sizing: border-box !important;
+    font-size: 14px !important;
+    padding: 0 15px !important; /* Padding consistente */
+}
+
+/* Container do slider mantendo estilo original */
 .slider-container {
     position: relative;
     width: 100%;
-    margin-top: 40px;
-    padding: 0 20px !important;
-    background-color: #ddd;
+    height: 40px; /* Altura fixa igual aos outros */
+    display: flex;
+    align-items: center;
+    background-color: var(--branco);
+    border: 1px solid var(--branco);
     border-radius: 20px;
+    padding: 0 20px !important;
+    box-sizing: border-box;
 }
 
+/* Estilo original do slider */
+.slider-container input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+    margin: 0;
+}
+
+/* A bolinha amarelinha bunitinha */
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--amarelo-claro);
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Para Firefox */
+input[type=range]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--amarelo-claro);
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Para Edge/IE */
+input[type=range]::-ms-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--amarelo-claro);
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Tooltip do slider */
 .tooltip {
     position: absolute;
     background-color: #333;
@@ -236,112 +316,36 @@
     pointer-events: none;
     transform: translateX(-50%);
     bottom: 30px;
-}
-
-input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 8px;
-    background: #ddd;
-    border-radius: 5px;
-}
-
-input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #4CAF50;
-    cursor: pointer;
-}
-
-#filtro-avaliacao {
-    color: black;
-}
-
-.slider-container {
-    position: relative;
-    margin-top: 0;
-    padding: 0; /* Remova o padding */
-}
-
-.slider-container .tooltip {
-    opacity: 0; /* Esconde a tooltip inicialmente */
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
 .slider-container:hover .tooltip {
-    opacity: 1; /* Mostra a tooltip ao passar o mouse */
+    opacity: 1;
 }
 
-input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--amarelo-claro); /* Cor da bolinha */
-}
-
-/* Estilo dos itens de filtro */
-.filter-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    height: auto;
-}
-
-.filter-item h3 {
-    padding-left: 40px;
-    width: 100%;
-    height: auto;
-    color: var(--branco)
-}
-
-#filtro-avaliacao {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 20px;
-    width: 100%;
-    height: 30px;
-    border: 1px solid var(--branco);
-    border-radius: 20px;
-    background-color: var(--branco);
-}
-
-#tempo-slider {
-    border-radius: 20px;
-    width: 100%;
-    height: 30px;
-}
-
-#filtro-categorias {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 30px;
-    border: 1px solid var(--branco);
-    border-radius: 20px;
-    background-color: var(--branco);
-}
-
+/* Estilo para o input de categorias */
 #filtro-categorias::placeholder {
-    padding: 0 20px;
+    color: var(--texto-placeholder);
+    opacity: 1;
 }
 
+/* Para o datalist das categorias */
+#categorias-lista option {
+    padding: 5px;
+}
+
+/* Estilos para selects */
+#filtro-avaliacao,
 #filtro-ordenacao {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 20px;
-    width: 100%;
-    height: 30px;
-    border: 1px solid var(--branco);
-    border-radius: 20px;
-    background-color: var(--branco);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 15px;
+    padding-right: 40px !important; /* Espaço para a seta */
 }
 
 /* Grade de pedidos */
@@ -351,7 +355,7 @@ input[type=range]::-webkit-slider-thumb {
     gap: 5%; /* Espaçamento entre cards */
     padding: 0;
     width: 100%;
-    margin-top: 1%;
+    margin-top: 2%;
 }
 
 /* Cartão de serviço */
@@ -359,7 +363,7 @@ input[type=range]::-webkit-slider-thumb {
     background-color: #B5BFAE;
     width: 100%;
     height: 50%;
-    box-sizing: border-box; /* Garante que padding/border não afetem a largura */
+    box-sizing: border-box;
     margin: 0;
     border-radius: 30px;
     display: flex;
@@ -373,6 +377,8 @@ input[type=range]::-webkit-slider-thumb {
 .service-image {
     width: 100%;
     height: 45%;
+    border-radius: 30px 30px 0 0;
+    object-fit: cover;
 }
 
 .service-title {
@@ -384,13 +390,14 @@ input[type=range]::-webkit-slider-thumb {
 .qty-chronos-service {
     display: flex;
     align-items: center;
-    gap: 1px;
+    gap: 10px;
     width: 100%;
+    margin: 10px 0;
 }
 
 .qty-chronos-service-img {
-    width: 15%;
-    height: 15%;
+    width: 20px;
+    height: 20px;
 }
 
 .qty-chronos-service-text {
@@ -400,6 +407,7 @@ input[type=range]::-webkit-slider-thumb {
 
 .user-service {
     margin: 10px 0;
+    color: #555;
 }
 
 .categories-service {
@@ -407,24 +415,26 @@ input[type=range]::-webkit-slider-thumb {
     flex-direction: row;
     gap: 10px;
     flex-wrap: wrap;
+    margin: 10px 0;
 }
 
 .category-service {
     display: flex;
     align-items: center;
     background-color: var(--amarelo-claro);
-    padding: 5px;
-    margin: 10px 0;
-    border-radius: 5px;
+    padding: 5px 10px;
+    border-radius: 15px;
     width: fit-content;
 }
 
 .category-service-img {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
 }
 
 .category-service-text {
     font-weight: bold;
     margin: 0;
+    font-size: 12px;
 }
