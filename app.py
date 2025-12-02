@@ -1,6 +1,5 @@
 # app.py
 from flask import Flask, jsonify, render_template
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
@@ -17,7 +16,8 @@ app.config['JWT_SECRET_KEY'] = 'segredo-jwt-muito-fortissimo'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
 # --- Inicialização de extensões ---
-db = SQLAlchemy(app)
+from models import db  # Agora importamos db de models
+db.init_app(app)  # Inicializar db com o app
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
 
@@ -30,14 +30,7 @@ CORS(app, resources={
     }
 })
 
-# --- Importar modelos e rotas ---
-from models import User, Service, Category, Document
-from routes import auth_bp, service_bp, user_bp
-
-# --- Registrar Blueprints ---
-app.register_blueprint(auth_bp)
-app.register_blueprint(service_bp)
-app.register_blueprint(user_bp)
+# NÃO importar blueprints aqui ainda - vamos importar depois
 
 # --- Rotas para servir páginas HTML ---
 @app.route('/')
@@ -61,5 +54,18 @@ def service_creation_page():
 def health_check():
     return jsonify({"status": "healthy", "message": "Flask app is running"})
 
-if __name__ == '_main_':
+# Importar e registrar blueprints APÓS a criação do app
+with app.app_context():
+    # Importar os modelos para garantir que estão registrados
+    from models import User, Service, Category, Document
+    
+    # Agora importar os blueprints
+    from routes import auth_bp, service_bp, user_bp
+    
+    # Registrar Blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(service_bp)
+    app.register_blueprint(user_bp)
+
+if __name__ == '__main__':
     app.run(debug=True, port=5000)

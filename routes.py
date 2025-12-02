@@ -1,11 +1,12 @@
 # routes.py
 from flask import Blueprint, request, jsonify
-from app import db
-from models import User, Service, Category, Document
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from werkzeug.security import generate_password_hash, check_password_hash
 import base64
 import re
+
+# Importar db e modelos de models.py (NÃO de app.py)
+from models import db, User, Service, Category, Document
 
 # --- Blueprints ---
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')

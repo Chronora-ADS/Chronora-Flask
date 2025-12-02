@@ -1,7 +1,10 @@
 # models.py
-from app import db
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import base64
+
+# Criar db separadamente, sem importar de app
+db = SQLAlchemy()
 
 # Modelo para Documento (um documento associado a um usuário)
 class Document(db.Model):
@@ -37,10 +40,10 @@ class Category(db.Model):
     # services = db.relationship('Service', secondary='service_categories', back_populates='categories')
 
 # Tabela associativa para relacionamento Service-Category
-# service_categories = db.Table('service_categories',
-#     db.Column('service_id', db.Integer, db.ForeignKey('services.id'), primary_key=True),
-#     db.Column('category_id', db.Integer, db.ForeignKey('categories.id'), primary_key=True)
-# )
+service_categories = db.Table('service_categories',
+    db.Column('service_id', db.Integer, db.ForeignKey('services.id'), primary_key=True),
+    db.Column('category_id', db.Integer, db.ForeignKey('categories.id'), primary_key=True)
+)
 
 # Modelo para Usuário
 class User(db.Model):
@@ -83,11 +86,6 @@ class User(db.Model):
         if include_document and self.document:
             user_dict['document'] = self.document.to_dict()
         return user_dict
-# Tabela associativa para relacionamento Service-Category
-service_categories = db.Table('service_categories',
-    db.Column('service_id', db.Integer, db.ForeignKey('services.id'), primary_key=True),
-    db.Column('category_id', db.Integer, db.ForeignKey('categories.id'), primary_key=True)
-)
 
 # No modelo Service, descomente e ajuste o relacionamento:
 class Service(db.Model):
