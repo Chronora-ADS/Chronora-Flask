@@ -348,93 +348,145 @@ input[type=range]::-ms-thumb {
     padding-right: 40px !important; /* Espaço para a seta */
 }
 
-/* Grade de pedidos */
+/* Grade de pedidos - SEMPRE 4 COLUNAS */
 #requests {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 colunas de tamanho igual */
-    gap: 5%; /* Espaçamento entre cards */
+    grid-template-columns: repeat(4, 1fr); /* SEMPRE 4 colunas */
+    gap: 20px; /* Espaçamento fixo entre cards */
     padding: 0;
     width: 100%;
     margin-top: 2%;
 }
 
-/* Cartão de serviço */
+/* Cartão de serviço - TAMANHO FIXO E CONSISTENTE */
 .service-card {
     background-color: #B5BFAE;
-    width: 100%;
-    height: 50%;
+    width: 100%; /* Ocupa 100% da coluna */
+    height: 350px; /* Altura fixa */
+    min-height: 350px; /* Altura mínima fixa */
+    max-height: 350px; /* Altura máxima fixa */
     box-sizing: border-box;
     margin: 0;
     border-radius: 30px;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* Garante que nada ultrapasse o card */
+    position: relative; /* Para posicionamento interno */
 }
 
 .service-info {
-    padding: 20px;
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .service-image {
     width: 100%;
-    height: 45%;
+    height: 160px; /* Altura fixa para a imagem */
+    min-height: 160px;
+    max-height: 160px;
     border-radius: 30px 30px 0 0;
-    object-fit: cover;
+    object-fit: cover; /* Corta a imagem para caber */
+    object-position: center; /* Centraliza a imagem */
 }
 
 .service-title {
-    font-size: 30px;
+    font-size: 18px;
     font-weight: bold;
-    margin: 10px 0;
+    margin: 8px 0 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #000;
+    line-height: 1.2;
+}
+
+.user-service {
+    margin: 2px 0;
+    color: #555;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.service-description {
+    font-size: 13px;
+    color: #666;
+    margin: 5px 0 8px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limita a 2 linhas */
+    -webkit-box-orient: vertical;
+    line-height: 1.4;
+    flex-shrink: 0;
 }
 
 .qty-chronos-service {
     display: flex;
     align-items: center;
-    gap: 10px;
-    width: 100%;
-    margin: 10px 0;
+    gap: 6px;
+    margin: 5px 0 10px 0;
+    flex-shrink: 0;
 }
 
 .qty-chronos-service-img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
 .qty-chronos-service-text {
     font-weight: bold;
     margin: 0;
-}
-
-.user-service {
-    margin: 10px 0;
-    color: #555;
+    font-size: 15px;
+    color: #000;
 }
 
 .categories-service {
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    gap: 6px;
     flex-wrap: wrap;
-    margin: 10px 0;
+    margin-top: auto; /* Empurra para baixo */
+    max-height: 40px;
+    overflow: hidden;
 }
 
 .category-service {
     display: flex;
     align-items: center;
     background-color: var(--amarelo-claro);
-    padding: 5px 10px;
+    padding: 4px 10px;
     border-radius: 15px;
     width: fit-content;
+    font-size: 11px;
+    flex-shrink: 0;
 }
 
 .category-service-img {
-    width: 16px;
-    height: 16px;
-    margin-right: 5px;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
 }
 
 .category-service-text {
     font-weight: bold;
     margin: 0;
-    font-size: 12px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* Estilo para mensagem de "nenhum resultado" */
+.no-results-message {
+    grid-column: 1 / -1; /* Ocupa todas as 4 colunas */
+    color: white;
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    margin-top: 20px;
 }
