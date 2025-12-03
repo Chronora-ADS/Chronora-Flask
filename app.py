@@ -49,6 +49,11 @@ def register_page():
 def service_creation_page():
     return render_template('ServiceCreation.html')
 
+# NOVA ROTA: Página de visualização de serviço
+@app.route('/view_service')
+def view_service_page():
+    return render_template('ViewService.html')
+
 # Rota de health check
 @app.route('/health')
 def health_check():

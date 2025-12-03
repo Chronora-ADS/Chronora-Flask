@@ -194,6 +194,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const card = document.createElement("div");
             card.className = "service-card";
             card.style.width = "100%"; // Força 100% da coluna
+            card.style.cursor = "pointer"; // Adiciona cursor de mãozinha
+            
+            // Adiciona evento de clique para navegar para a página de ver pedido
+            card.addEventListener('click', function() {
+                // Redireciona para a página de ver pedido com o ID do serviço
+                window.location.href = `/view_service?id=${servico.id}`;
+            });
 
             // Verifica se serviceImage existe e é uma string base64 válida
             let imageSrc = "/static/img/default-service.png"; // Imagem padrão

@@ -155,6 +155,31 @@ def get_all_services():
     services_data = [service.to_dict() for service in services]
     return jsonify(services_data), 200
 
+# NOVA ROTA: Aceitar um serviço (opcional - para funcionalidade completa)
+@service_bp.route('/accept/<int:service_id>', methods=['POST'])
+@jwt_required()
+def accept_service(service_id):
+    current_user_id = int(get_jwt_identity())
+    data = request.get_json()
+    user_id = data.get('userId')
+    
+    if current_user_id != user_id:
+        return jsonify({"error": "Acesso negado."}), 403
+    
+    service = Service.query.get(service_id)
+    if not service:
+        return jsonify({"error": "Serviço não encontrado."}), 404
+    
+    # Aqui você pode implementar a lógica de aceitação do serviço
+    # Por exemplo, criar uma nova tabela de "aceitações" ou atualizar o status do serviço
+    
+    # Por enquanto, retornamos uma mensagem de sucesso
+    return jsonify({
+        "message": "Serviço aceito com sucesso",
+        "service_id": service_id,
+        "accepted_by": user_id
+    }), 200
+
 # --- Rotas de Usuário ---
 @user_bp.route('/get/<int:user_id>', methods=['GET'])
 def get_user_by_id(user_id):

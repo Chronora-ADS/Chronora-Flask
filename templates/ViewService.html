@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Pedido - Chronora</title>
+    <!-- Links para CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ViewService.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
+</head>
+<body>
+    <div id="container">
+        <!-- Cabeçalho -->
+        <div id="container-header">
+            <div id="icon-left">
+                <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
+                <p id="icon-left-text">Chronora</p>
+            </div>
+            <div id="search-bar">
+                <div class="search-container">
+                    <input type="text" name="search-bar" placeholder="Pintura de parede, aula de inglês..." id="input-search-bar">
+                    <img src="{{ url_for('static', filename='img/Search.png') }}" alt="" class="icon-search">
+                </div>
+            </div>
+            <div id="navbar-buttons">
+                <a class="navbar-a" href="{{ url_for('service_creation_page') }}"><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a>
+                <div class="qty-chronos">
+                    <img class="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
+                    <p class="qty-chronos-text">123</p>
+                </div>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Briefcase.png') }}" alt=""></a>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Profile.png') }}" alt=""></a>
+                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Settings.png') }}" alt=""></a>
+            </div>
+        </div>
+
+        <!-- Fundo decorativo -->
+        <div id="container-background">
+            <img class="background" id="comb-left" src="{{ url_for('static', filename='img/Comb3.png') }}" alt="">
+            <img class="background" id="comb-right" src="{{ url_for('static', filename='img/Comb4.png') }}" alt="">
+        </div>
+
+        <!-- Conteúdo principal -->
+        <div id="container-content">
+            <!-- Container com duas colunas -->
+            <div class="two-column-layout">
+                <!-- CARD PRINCIPAL COM BORDA AMARELA -->
+                <div class="main-service-card">
+                    <!-- Linha 1: Apenas o título -->
+                    <div class="service-header-row">
+                        <div class="service-title-section">
+                            <h1 id="service-title">Título do pedido Lorem Ipsum</h1>
+                        </div>
+                    </div>
+
+                    <!-- Linha 2: Imagem à esquerda, PRIMEIRA LINHA da descrição à direita -->
+                    <div class="service-first-row">
+                        <!-- Coluna esquerda: Apenas a imagem -->
+                        <div class="service-image-column">
+                            <div class="service-image-container">
+                                <img id="service-image" src="{{ url_for('static', filename='img/default-service.png') }}" alt="Imagem do Serviço">
+                            </div>
+                        </div>
+
+                        <!-- Coluna direita: APENAS A PRIMEIRA LINHA da descrição -->
+                        <div class="service-first-description-column">
+                            <div class="description-first-line" id="description-first-line">
+                                <!-- Apenas a primeira linha da descrição será carregada aqui -->
+                                <strong>Maceenasante turpis,</strong> finibus vel odio eget, cursus sagittis dui.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Linha 3: CONTINUAÇÃO DA DESCRIÇÃO (largura total, abaixo da imagem) -->
+                    <div class="service-description-continuation-row">
+                        <div class="description-continuation-full" id="description-continuation-full">
+                            <!-- O restante da descrição será carregado aqui -->
+                            Cras eu tristique nibh. Sed lacinia, nibh at convallis pellentesque, tortor ipsum imperdiet nisi, a placerat arcu nulla ut diam. Phasellus aliquam nisi sit amet sollicitudin ultricies. Suspendisse venenatis pulvinar ligula vel hendrerit. Suspendisse in cursus metus. Maceenas non convallis turpis, id varius lorem. Fusce in odio at urna ultrices placerat id at mi. Etiam tempor non elit vel convallis.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUNA DIREITA EXTERNA: Detalhes e Botão -->
+                <div class="right-column">
+                    <!-- Categorias (em cima - PRIMEIRO) -->
+                    <div class="service-categories-section">
+                        <div class="categories-list" id="categories-container">
+                            <!-- Categorias serão preenchidas dinamicamente -->
+                            <div class="category-item">
+                                <img src="{{ url_for('static', filename='img/Paintbrush.png') }}" alt="Ícone Categoria">
+                                <span>Pinturas gerais</span>
+                            </div>
+                            <div class="category-item">
+                                <img src="{{ url_for('static', filename='img/Paintbrush.png') }}" alt="Ícone Categoria">
+                                <span>Pintura de parede</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações de Chronos (com borda e fundo branco) - SEGUNDO -->
+                    <div class="chronos-info-section bordered-box">
+                        <div class="chronos-details">
+                            <img class="chronos-icon" src="{{ url_for('static', filename='img/Coin.png') }}" alt="Ícone Chronos">
+                            <div class="chronos-amount">
+                                <div class="chronos-value" id="chronos-value">50</div>
+                                <div class="chronos-label">chronos</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações de Postagem (com borda e fundo branco) - TERCEIRO -->
+                    <div class="post-info-section bordered-box">
+                        <div class="post-header">
+                            <h3>Postado as <span class="post-time-highlight" id="post-time">15:41</span> por:</h3>
+                        </div>
+                        <div class="post-details">
+                            <div class="user-info-container">
+                                <div class="user-icon-name">
+                                    <img class="user-icon" src="{{ url_for('static', filename='img/Profile.png') }}" alt="Ícone Usuário">
+                                    <span class="user-name" id="user-name">Lorem Ipsum da Silva</span>
+                                </div>
+                                <div class="user-rating-single">
+                                    <span class="single-star">★</span>
+                                    <span class="rating-value" id="user-rating">4.9</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Aceitar Pedido - QUARTO -->
+                    <div class="accept-request-section">
+                        <button id="btn-accept-request">Aceitar pedido</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/ViewService.js') }}"></script>
+</body>
+</html>
