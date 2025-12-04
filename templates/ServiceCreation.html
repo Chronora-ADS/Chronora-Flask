@@ -17,7 +17,7 @@
             </div>
             <div id="search-bar">
                 <div class="search-container">
-                    <input type="text" name="search-bar" placeholder="Pintura de parede, aula de inglês..." id="input-search-bar">
+                    <input type="text" name="search-bar" placeholder="Pintura de parede, aula de inglês..." id="input-search-bar" autocomplete="off">
                     <img src="{{ url_for('static', filename='img/Search.png') }}" alt="" class="icon-search">
                 </div>
             </div>
@@ -43,29 +43,63 @@
         <div id="container-form">
             <h1>Criação do pedido</h1>
 
-            <!-- Formulário com id -->
-            <form id="register-form" class="form-container">
-                <input type="text" name="titulo" placeholder="Título" id="input-title" required>
-                <textarea name="descricao" placeholder="Descrição" id="input-description" required></textarea>
-                <input type="number" min="1" name="tempoChronos" placeholder="Tempo em Chronos" id="input-time-chronos" required>
+            <!-- Formulário com id e autocomplete desabilitado -->
+            <form id="register-form" class="form-container" autocomplete="off" novalidate>
+                <!-- Título -->
+                <div class="form-group">
+                    <div class="field-with-error">
+                        <input type="text" name="titulo" placeholder="Título" id="input-title" required autocomplete="off">
+                        <span class="error-symbol outside" id="title-error">⊝</span>
+                    </div>
+                </div>
+                
+                <!-- Descrição -->
+                <div class="form-group">
+                    <div class="field-with-error">
+                        <textarea name="descricao" placeholder="Descrição" id="input-description" required autocomplete="off"></textarea>
+                        <span class="error-symbol outside" id="description-error">⊝</span>
+                    </div>
+                </div>
+                
+                <!-- Tempo em Chronos -->
+                <div class="form-group">
+                    <div class="field-with-error">
+                        <input type="number" min="1" max="100" name="tempoChronos" placeholder="Tempo em Chronos (1-100)" id="input-time-chronos" required autocomplete="off">
+                        <span class="error-symbol outside" id="time-error">⊝</span>
+                    </div>
+                </div>
+                
                 <!-- Campo de categoria -->
-                <div class="category-input-container">
-                    <label for="input-category" id="label-category">Categorias</label>
-                    <div class="input-with-tags">
-                        <input type="text" name="categoria" id="input-category" placeholder="Escreva e aperte Enter" />
-                        <div id="category-tag-list" class="tag-list"></div>
+                <div class="form-group category-group">
+                    <div class="category-input-container">
+                        <div class="field-with-error">
+                            <div class="category-content">
+                                <label for="input-category" id="label-category">Categorias</label>
+                                <div class="input-with-tags">
+                                    <input type="text" name="categoria" id="input-category" placeholder="Escreva e aperte Enter" autocomplete="off" />
+                                    <div id="category-tag-list" class="tag-list"></div>
+                                </div>
+                            </div>
+                            <span class="error-symbol outside" id="category-error">⊝</span>
+                        </div>
                     </div>
                 </div>
 
-                <input type="file" name="input-service-image" id="input-service-image" accept=".jpg,.jpeg,.png">
-                <button type="button" id="btn-service-image">
-                    Imagem do Pedido
-                    <img src="{{ url_for('static', filename='img/AddImage.png') }}" alt="" id="icon-service-image">
-                </button>
-                <span id="service-image-chosen"></span> <!-- Elemento para mostrar o nome da imagem -->
+                <!-- Imagem -->
+                <div class="form-group">
+                    <input type="file" name="input-service-image" id="input-service-image" accept=".jpg,.jpeg,.png" autocomplete="off" required>
+                    <button type="button" id="btn-service-image">
+                        <span class="btn-text">Imagem do Pedido</span>
+                        <img src="{{ url_for('static', filename='img/AddImage.png') }}" alt="" id="icon-service-image">
+                    </button>
+                    <span id="service-image-chosen"></span>
+                </div>
 
                 <div id="bottom-btns">
-                    <a href="{{ url_for('main_page') }}" id="a-cancel"><button id="btn-cancel">Cancelar</button></a> <!-- Link para Página Principal Flask -->
+                    <!-- Link de cancelar estilizado como botão -->
+                    <a href="{{ url_for('main_page') }}" id="btn-cancel" class="btn-cancel-link">
+                        Cancelar
+                    </a>
                     <button type="submit" id="btn-register">Criar Pedido</button>
                 </div>
             </form>

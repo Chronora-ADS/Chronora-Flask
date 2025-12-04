@@ -19,7 +19,7 @@
     justify-content: center;
     align-items: center;
     width: 30%;
-    height: 65%;
+    height: auto;
     min-height: fit-content;
     background-color: var(--branco);
     border-radius: 40px;
@@ -182,7 +182,7 @@
 }
 
 /* Formulário */
-#login-form { /* Ajuste: O formulário é #register-form, mas esta regra existia no CSS original */
+#login-form {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -192,6 +192,65 @@
 #container-form h1 {
     margin: 0;
     margin-bottom: 5%;
+}
+
+/* Container para cada campo do formulário */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+    margin: 5px 0;
+}
+
+/* Container especial para categoria */
+.form-group.category-group {
+    width: 75%;
+    position: relative;
+}
+
+/* Container para campo com símbolo de erro FORA */
+.field-with-error {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+/* Para categoria específica, ajuste do field-with-error */
+.form-group.category-group .field-with-error {
+    position: static;
+}
+
+/* Símbolo de erro FORA das caixas */
+.error-symbol.outside {
+    position: absolute;
+    right: -35px; /* Posiciona FORA da caixa */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ff4444;
+    font-size: 28px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.error-symbol.outside.show {
+    opacity: 1;
+}
+
+/* Para textarea, ajusta a posição do símbolo */
+.field-with-error textarea + .error-symbol.outside {
+    top: 25px;
+    transform: translateY(0);
+}
+
+/* Ajuste específico para o símbolo de erro na categoria */
+.form-group.category-group .error-symbol.outside {
+    right: -40px;
+    top: 40px;
+    transform: translateY(0);
 }
 
 /* Inputs do formulário */
@@ -204,31 +263,77 @@ textarea {
     border: 1px solid var(--branco-borda);
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.25);
     padding: 10px;
-    margin: 5px;
-    width: 75%;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
 }
 
+/* Placeholder normal */
 input[type=text]::placeholder,
 input[type=number]::placeholder,
 textarea::placeholder {
     color: var(--texto-placeholder);
+    opacity: 1;
+    transition: color 0.3s ease;
+}
+
+/* Placeholder com erro (vermelho) */
+input[type=text].error::placeholder,
+input[type=number].error::placeholder,
+textarea.error::placeholder {
+    color: #ff4444 !important;
+}
+
+/* Estilo para campos com erro */
+input[type=text].error,
+input[type=number].error,
+textarea.error {
+    border-color: #ff4444 !important;
+    border-width: 2px !important;
+    background-color: #fff8f8 !important;
+    color: #333;
 }
 
 textarea {
     resize: none;
+    min-height: 100px;
 }
 
 /* Container de categorias */
 .category-input-container {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    width: 75%;
+    width: 100%;
     padding: 10px;
-    margin: 5px;
+    margin: 5px 0;
     background-color: var(--branco);
     border: 1px solid var(--branco-borda);
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+/* Conteúdo da categoria */
+.category-content {
+    width: 100%;
+}
+
+/* Label de categoria com erro */
+.category-input-container.error #label-category {
+    color: #ff4444 !important;
+}
+
+/* Estilo para container de categoria com erro */
+.category-input-container.error {
+    border-color: #ff4444 !important;
+    border-width: 2px !important;
+    background-color: #fff8f8 !important;
+}
+
+.category-input-container.error #input-category::placeholder {
+    color: #ff4444 !important;
 }
 
 .input-with-tags {
@@ -237,6 +342,7 @@ textarea {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    margin-top: 8px;
 }
 
 .tag {
@@ -247,6 +353,7 @@ textarea {
     padding: 5px 10px;
     margin: 5px;
     font-size: 14px;
+    border-radius: 3px;
 }
 
 .tag .remove-tag {
@@ -259,6 +366,9 @@ textarea {
 #label-category {
     font-size: 18px;
     color: var(--texto-placeholder);
+    transition: color 0.3s ease;
+    display: block;
+    margin-bottom: 5px;
 }
 
 #input-category {
@@ -266,13 +376,18 @@ textarea {
     font-size: 20px;
     flex-grow: 1;
     padding: 5px;
+    border: none;
+    background: transparent;
+    width: 100%;
+    min-width: 150px;
 }
 
 #input-category::placeholder {
     color: var(--texto-placeholder);
+    transition: color 0.3s ease;
 }
 
-/* Container inferior com "Lembre-se de mim" e "Esqueceu a senha?" (Ajuste: Não está no HTML, mas existia no CSS original) */
+/* Container inferior com "Lembre-se de mim" e "Esqueceu a senha?" */
 #bottom-inputs-container {
     display: flex;
     align-items: center;
@@ -283,38 +398,8 @@ textarea {
     width: 70%;
 }
 
-/* Estilo para o checkbox personalizado (Ajuste: Não está no HTML, mas existia no CSS original) */
-.checkbox {
-    position: absolute;
-    opacity: 0;
-    width: 1px;
-    height: 1px;
-}
-
-.checkbox + label {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    user-select: none;
-}
-
-.checkbox + label::before {
-    content: "";
-    background: url('../img/UncheckedCheckbox.png') no-repeat;
-    background-size: contain;
-    width: 30px;
-    height: 30px;
-    display: inline-block;
-}
-
-.checkbox:checked + label::before {
-    background-image: url('../img/CheckedCheckbox.png');
-}
-
 /* Botões */
-#btn-service-image, #btn-register, #btn-cancel {
+#btn-service-image, #btn-register, .btn-cancel-link {
     display: flex;
     align-items: center;
     font-size: 22px;
@@ -323,16 +408,37 @@ textarea {
     position: relative;
     cursor: pointer;
     padding: 10px;
+    text-decoration: none;
+    border: none;
+    outline: none;
+    text-align: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
+/* Botão de imagem - ESTILO BASE */
 #btn-service-image {
     padding-left: 20px;
-    padding-right: 0; /* garante borda direita limpa */
-    width: 79%;
+    padding-right: 0;
+    width: 100%;
     background: var(--branco);
     color: var(--amarelo-um-pouco-escuro);
     border: 3px solid var(--amarelo-um-pouco-escuro);
     justify-content: space-between;
+    margin-top: 5px;
+    transition: all 0.3s ease;
+}
+
+/* Texto do botão de imagem */
+#btn-service-image .btn-text {
+    color: var(--amarelo-um-pouco-escuro);
+    transition: color 0.3s ease;
+}
+
+/* Botão de imagem com erro - apenas o texto fica vermelho */
+#btn-service-image.error .btn-text {
+    color: #ff4444 !important;
+    font-weight: bold;
 }
 
 #btn-register {
@@ -343,12 +449,37 @@ textarea {
     justify-content: center;
 }
 
-#btn-cancel {
-    width: 100%;
+/* Link estilizado como botão de cancelar */
+.btn-cancel-link {
+    width: 47%;
     background: var(--branco);
     color: var(--amarelo-um-pouco-escuro);
     border: 3px solid var(--amarelo-um-pouco-escuro);
     justify-content: center;
+    transition: all 0.3s ease;
+}
+
+/* Efeitos hover para os botões */
+#btn-register:hover {
+    background-color: #d4b300;
+    transform: translateY(-2px);
+    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.3);
+}
+
+.btn-cancel-link:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.3);
+}
+
+#btn-service-image:hover {
+    background-color: #f9f9f9;
+    transform: translateY(-2px);
+    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.3);
+}
+
+#btn-service-image:hover .btn-text {
+    color: #d4b300;
 }
 
 /* Ícones e elementos auxiliares */
@@ -364,26 +495,87 @@ textarea {
 #service-image-chosen {
     font-size: 14px;
     color: #666;
-    margin-top: -10px;
-    margin-bottom: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
     align-self: flex-start;
+    padding-left: 5px;
 }
 
 #input-service-image {
     display: none;
 }
 
-#a-cancel {
-    text-decoration: none;
-    cursor: pointer;
-    position: relative;
-    width: 47%;
-}
-
+/* Container dos botões inferiores */
 #bottom-btns {
-    width: 79%;
+    width: 75%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 5%;
+    margin-top: 20px;
+    gap: 6%;
+}
+
+/* Garantir que os botões tenham largura consistente */
+#btn-register, .btn-cancel-link {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Ajuste responsivo para telas menores */
+@media (max-width: 1200px) {
+    #container-form {
+        width: 40%;
+    }
+    
+    .error-symbol.outside {
+        right: -30px;
+        font-size: 24px;
+    }
+    
+    .form-group.category-group .error-symbol.outside {
+        right: -35px;
+        font-size: 24px;
+        top: 35px;
+    }
+}
+
+@media (max-width: 768px) {
+    #container-form {
+        width: 60%;
+    }
+    
+    #btn-register, .btn-cancel-link {
+        font-size: 18px;
+        padding: 8px;
+    }
+    
+    input[type=text],
+    input[type=number],
+    textarea {
+        font-size: 16px;
+    }
+    
+    .error-symbol.outside {
+        right: -25px;
+        font-size: 20px;
+    }
+    
+    .form-group.category-group .error-symbol.outside {
+        right: -30px;
+        font-size: 20px;
+        top: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .error-symbol.outside {
+        right: -20px;
+        font-size: 18px;
+    }
+    
+    .form-group.category-group .error-symbol.outside {
+        right: -25px;
+        font-size: 18px;
+        top: 25px;
+    }
 }

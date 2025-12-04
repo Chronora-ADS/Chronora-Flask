@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Variáveis globais para armazenar serviços
     let todosServicos = [];
     let servicosFiltrados = [];
+    let categoriaAtual = null; // Armazena a categoria selecionada atualmente
+    let tempoAtual = null; // Armazena o intervalo de tempo selecionado atual {min, max}
 
     // ----- TAG DE CATEGORIAS -----
     const inputCategory = document.getElementById('input-category');
@@ -32,26 +34,46 @@ document.addEventListener("DOMContentLoaded", function () {
         element.parentElement.remove();
     }
 
-    // Dados simulados de categorias
-    const categorias = ["Pintura", "Mecânica", "Engenharia", "Elétrica"];
+    // Extrai todas as categorias únicas dos serviços
+    function extrairCategoriasUnicas(servicos) {
+        const categorias = new Set();
+        servicos.forEach(servico => {
+            if (servico.categoryEntities && servico.categoryEntities.length > 0) {
+                servico.categoryEntities.forEach(cat => {
+                    if (cat.name) {
+                        categorias.add(cat.name);
+                    }
+                });
+            }
+        });
+        return Array.from(categorias).sort();
+    }
 
-    function popularCategoriasDatalist() {
+    // Popular o datalist com categorias dos serviços
+    function popularCategoriasDatalist(servicos) {
         const datalist = document.getElementById("categorias-lista");
         if (!datalist) return;
+        
+        const categorias = extrairCategoriasUnicas(servicos);
         datalist.innerHTML = "";
+        
         categorias.forEach(cat => {
             const option = document.createElement("option");
             option.value = cat;
             datalist.appendChild(option);
         });
+        
+        console.log("Categorias disponíveis:", categorias);
     }
-
-    popularCategoriasDatalist();
 
     // ----- SLIDER E TOOLTIP -----
     const slider = document.getElementById("tempo-slider");
     const tooltip = document.getElementById("tooltip");
+    const btnAplicarTempo = document.getElementById("btn-aplicar-tempo");
+    const btnLimparTempo = document.getElementById("btn-limpar-tempo");
+    const tempoSelecionadoDiv = document.getElementById("tempo-selecionado");
 
+    // Atualizar tooltip com o valor atual do slider
     function updateTooltip() {
         if (!slider || !tooltip) return;
 
@@ -59,19 +81,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const min = parseInt(slider.min);
         const max = parseInt(slider.max);
         
-        // Calcula o texto mostrando de 5 em 5
-        let texto = "";
-        if (val === 5) {
-            texto = "0-5";
-        } else {
-            texto = `${val-5}-${val}`;
-        }
+        // Calcula o intervalo de tempo
+        let minTempo = val === 5 ? 0 : val - 5;
+        let maxTempo = val;
         
-        tooltip.textContent = texto;
+        tooltip.textContent = `${minTempo}-${maxTempo}`;
 
         // Posicionamento da tooltip
         const sliderWidth = slider.offsetWidth;
-        const thumbWidth = 20;
+        const thumbWidth = 16; // Tamanho reduzido da bolinha
         const percent = (val - min) / (max - min);
         const pos = percent * (sliderWidth - thumbWidth) + (thumbWidth / 2);
         
@@ -100,6 +118,68 @@ document.addEventListener("DOMContentLoaded", function () {
         updateTooltip();
     }
 
+    // Função para obter o intervalo de tempo do slider
+    function getIntervaloTempo() {
+        if (!slider) return { min: 0, max: 5 };
+        
+        const val = parseInt(slider.value);
+        const minTempo = val === 5 ? 0 : val - 5;
+        const maxTempo = val;
+        
+        return { min: minTempo, max: maxTempo };
+    }
+
+    // Atualizar visibilidade do botão de limpar tempo
+    function atualizarBotaoLimparTempo() {
+        if (btnLimparTempo) {
+            if (tempoAtual) {
+                btnLimparTempo.classList.add("visivel");
+            } else {
+                btnLimparTempo.classList.remove("visivel");
+            }
+        }
+    }
+
+    // Função para filtrar serviços por intervalo de tempo
+    function filtrarPorTempo(intervalo) {
+        if (!intervalo) {
+            // Se não houver intervalo, mostra todos os serviços
+            servicosFiltrados = [...todosServicos];
+            tempoAtual = null;
+            tempoSelecionadoDiv.textContent = "";
+            tempoSelecionadoDiv.classList.remove("ativa");
+            console.log("Filtro de tempo removido. Mostrando todos os serviços.");
+        } else {
+            // Filtra serviços que estão dentro do intervalo de tempo
+            servicosFiltrados = todosServicos.filter(servico => {
+                const tempoServico = servico.timeChronos || 0;
+                return tempoServico >= intervalo.min && tempoServico <= intervalo.max;
+            });
+            
+            tempoAtual = intervalo;
+            tempoSelecionadoDiv.textContent = `Filtrando por: ${intervalo.min}-${intervalo.max} chronos`;
+            tempoSelecionadoDiv.classList.add("ativa");
+            console.log(`Filtrados ${servicosFiltrados.length} serviços pelo tempo: ${intervalo.min}-${intervalo.max} chronos`);
+        }
+        
+        atualizarBotaoLimparTempo();
+        
+        // Aplica também os outros filtros se houverem
+        aplicarFiltrosCombinados();
+    }
+
+    // Função para aplicar filtro de tempo quando clicar em OK
+    function aplicarFiltroTempo() {
+        const intervalo = getIntervaloTempo();
+        filtrarPorTempo(intervalo);
+    }
+
+    // Função para limpar o filtro de tempo
+    function limparFiltroTempo() {
+        filtrarPorTempo(null);
+    }
+
+    // Configurar eventos para o slider de tempo
     if (slider && tooltip) {
         // Atualiza tooltip ao mover o slider
         slider.addEventListener("input", function() {
@@ -121,23 +201,163 @@ document.addEventListener("DOMContentLoaded", function () {
         updateTooltip();
     }
 
+    // Configurar evento para o botão OK
+    if (btnAplicarTempo) {
+        btnAplicarTempo.addEventListener("click", aplicarFiltroTempo);
+    }
+
+    // Configurar evento para o botão X (limpar tempo)
+    if (btnLimparTempo) {
+        btnLimparTempo.addEventListener("click", limparFiltroTempo);
+    }
+
+    // ----- FILTRAGEM POR CATEGORIA -----
+    const inputCategoria = document.getElementById("filtro-categorias");
+    const btnLimparCategoria = document.getElementById("btn-limpar-categoria");
+    const categoriaSelecionadaDiv = document.getElementById("categoria-selecionada");
+
+    // Mostrar/ocultar botão X baseado no conteúdo do input
+    function atualizarBotaoLimpar() {
+        if (btnLimparCategoria && inputCategoria) {
+            if (inputCategoria.value.trim() !== "" || categoriaAtual) {
+                btnLimparCategoria.classList.add("visivel");
+            } else {
+                btnLimparCategoria.classList.remove("visivel");
+            }
+        }
+    }
+
+    // Função para filtrar serviços por categoria
+    function filtrarPorCategoria(categoriaNome) {
+        if (!categoriaNome || categoriaNome.trim() === "") {
+            // Se não houver categoria, remove o filtro
+            categoriaAtual = null;
+            categoriaSelecionadaDiv.textContent = "";
+            categoriaSelecionadaDiv.classList.remove("ativa");
+            console.log("Filtro de categoria removido.");
+        } else {
+            // Define a categoria atual
+            categoriaAtual = categoriaNome;
+            categoriaSelecionadaDiv.textContent = `Filtrando por: ${categoriaNome}`;
+            categoriaSelecionadaDiv.classList.add("ativa");
+            console.log(`Filtrando pela categoria: ${categoriaNome}`);
+        }
+        
+        atualizarBotaoLimpar();
+        aplicarFiltrosCombinados();
+    }
+
+    // Função para limpar o filtro de categoria
+    function limparFiltroCategoria() {
+        inputCategoria.value = "";
+        filtrarPorCategoria("");
+        inputCategoria.focus();
+    }
+
+    // Configurar eventos para o filtro de categoria
+    if (inputCategoria) {
+        // Filtrar ao pressionar Enter
+        inputCategoria.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault(); // Previne comportamento padrão
+                const categoria = inputCategoria.value.trim();
+                if (categoria) {
+                    filtrarPorCategoria(categoria);
+                }
+            }
+        });
+        
+        // Atualizar visibilidade do botão X enquanto digita
+        inputCategoria.addEventListener("input", function() {
+            atualizarBotaoLimpar();
+            
+            // Se o input estiver vazio e havia um filtro ativo, limpa o filtro
+            if (this.value.trim() === "" && categoriaAtual) {
+                filtrarPorCategoria("");
+            }
+        });
+        
+        // Filtrar também ao selecionar uma opção do datalist
+        inputCategoria.addEventListener("change", function() {
+            const categoria = inputCategoria.value.trim();
+            if (categoria) {
+                setTimeout(() => {
+                    filtrarPorCategoria(categoria);
+                }, 100);
+            }
+        });
+    }
+
+    // Configurar evento para o botão X (limpar categoria)
+    if (btnLimparCategoria) {
+        btnLimparCategoria.addEventListener("click", limparFiltroCategoria);
+        atualizarBotaoLimpar();
+    }
+
     // ----- PESQUISA DE SERVIÇOS -----
     const inputSearchBar = document.getElementById("input-search-bar");
     
     // Função para filtrar serviços por termo de busca
     function filtrarServicosPorTermo(termo) {
         if (!termo || termo.trim() === "") {
-            // Se o campo de busca estiver vazio, mostra todos os serviços
-            servicosFiltrados = [...todosServicos];
-        } else {
-            const termoLowerCase = termo.toLowerCase().trim();
-            // Filtra serviços cujo título contenha o termo de busca (case-insensitive)
-            servicosFiltrados = todosServicos.filter(servico => {
-                const titulo = servico.title || '';
-                return titulo.toLowerCase().includes(termoLowerCase);
+            aplicarFiltrosCombinados();
+            return;
+        }
+        
+        const termoLowerCase = termo.toLowerCase().trim();
+        
+        // Primeiro aplica filtros de categoria e tempo
+        aplicarFiltrosCombinados();
+        
+        // Depois filtra por termo de busca nos serviços já filtrados
+        const servicosComFiltros = [...servicosFiltrados];
+        servicosFiltrados = servicosComFiltros.filter(servico => {
+            const titulo = servico.title || '';
+            const descricao = servico.description || '';
+            
+            // Busca no título OU na descrição
+            return titulo.toLowerCase().includes(termoLowerCase) || 
+                   descricao.toLowerCase().includes(termoLowerCase);
+        });
+        
+        exibirServicos(servicosFiltrados);
+    }
+
+    // Função para aplicar todos os filtros combinados
+    function aplicarFiltrosCombinados() {
+        let servicosParaFiltrar = [...todosServicos];
+        
+        // Aplica filtro de categoria
+        if (categoriaAtual) {
+            servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
+                if (!servico.categoryEntities || servico.categoryEntities.length === 0) {
+                    return false;
+                }
+                
+                return servico.categoryEntities.some(cat => {
+                    if (!cat.name) return false;
+                    return cat.name.toLowerCase().includes(categoriaAtual.toLowerCase());
+                });
             });
         }
-        exibirServicos(servicosFiltrados);
+        
+        // Aplica filtro de tempo
+        if (tempoAtual) {
+            servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
+                const tempoServico = servico.timeChronos || 0;
+                return tempoServico >= tempoAtual.min && tempoServico <= tempoAtual.max;
+            });
+        }
+        
+        servicosFiltrados = servicosParaFiltrar;
+        
+        // Aplica filtro de busca se houver
+        const termoBusca = inputSearchBar?.value;
+        if (termoBusca && termoBusca.trim() !== "") {
+            filtrarServicosPorTermo(termoBusca);
+        } else {
+            exibirServicos(servicosFiltrados);
+        }
     }
 
     // Adiciona evento de input para a barra de pesquisa
@@ -148,7 +368,7 @@ document.addEventListener("DOMContentLoaded", function () {
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
                 filtrarServicosPorTermo(this.value);
-            }, 300); // Aguarda 300ms após parar de digitar
+            }, 300);
         });
 
         // Pesquisa ao pressionar Enter
@@ -181,7 +401,24 @@ document.addEventListener("DOMContentLoaded", function () {
             // Mensagem de "nenhum resultado" que ocupa todas as 4 colunas
             const mensagem = document.createElement("div");
             mensagem.className = "no-results-message";
-            mensagem.textContent = "Nenhum serviço encontrado.";
+            
+            let mensagemTexto = "Nenhum serviço encontrado";
+            const filtrosAtivos = [];
+            
+            if (categoriaAtual) filtrosAtivos.push(`categoria "${categoriaAtual}"`);
+            if (tempoAtual) filtrosAtivos.push(`tempo ${tempoAtual.min}-${tempoAtual.max} chronos`);
+            
+            const termoBusca = inputSearchBar?.value;
+            if (termoBusca && termoBusca.trim() !== "") {
+                filtrosAtivos.push(`busca "${termoBusca}"`);
+            }
+            
+            if (filtrosAtivos.length > 0) {
+                mensagemTexto += ` com ${filtrosAtivos.join(" e ")}`;
+            }
+            mensagemTexto += ".";
+            
+            mensagem.textContent = mensagemTexto;
             requestsContainer.appendChild(mensagem);
             return;
         }
@@ -194,13 +431,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const card = document.createElement("div");
             card.className = "service-card";
             card.style.width = "100%"; // Força 100% da coluna
-            card.style.cursor = "pointer"; // Adiciona cursor de mãozinha
-            
-            // Adiciona evento de clique para navegar para a página de ver pedido
-            card.addEventListener('click', function() {
-                // Redireciona para a página de ver pedido com o ID do serviço
-                window.location.href = `/view_service?id=${servico.id}`;
-            });
 
             // Verifica se serviceImage existe e é uma string base64 válida
             let imageSrc = "/static/img/default-service.png"; // Imagem padrão
@@ -216,16 +446,36 @@ document.addEventListener("DOMContentLoaded", function () {
             const descricao = servico.description || '';
             const descricaoLimitada = descricao.length > 60 ? descricao.substring(0, 60) + '...' : descricao;
 
-            // Limita categorias (máximo 3)
+            // Obtém o tempo do serviço
+            const tempoServico = servico.timeChronos || 0;
+            
+            // Verifica se o tempo está dentro do filtro (para destaque)
+            let classeTempoDestaque = '';
+            if (tempoAtual && tempoServico >= tempoAtual.min && tempoServico <= tempoAtual.max) {
+                classeTempoDestaque = ' tempo-destaque';
+            }
+
+            // Limita categorias (máximo 3) e destaca a categoria filtrada
             let categoriasHTML = '';
             if (servico.categoryEntities && servico.categoryEntities.length > 0) {
                 const categoriasLimitadas = servico.categoryEntities.slice(0, 3); // Máximo 3 categorias
-                categoriasHTML = categoriasLimitadas.map(cat => `
-                    <div class="category-service">
-                        <img class="category-service-img" src="/static/img/Paintbrush.png" alt="Category Icon">
-                        <p class="category-service-text">${(cat.name || 'Categoria').substring(0, 12)}${(cat.name || '').length > 12 ? '...' : ''}</p>
-                    </div>
-                `).join('');
+                categoriasHTML = categoriasLimitadas.map(cat => {
+                    const categoriaNome = cat.name || 'Categoria';
+                    let classeExtra = '';
+                    
+                    // Destaca a categoria que está sendo filtrada
+                    if (categoriaAtual && categoriaNome.toLowerCase().includes(categoriaAtual.toLowerCase())) {
+                        classeExtra = ' categoria-destaque';
+                    }
+                    
+                    const nomeExibicao = categoriaNome.substring(0, 12) + (categoriaNome.length > 12 ? '...' : '');
+                    return `
+                        <div class="category-service${classeExtra}" title="${categoriaNome}">
+                            <img class="category-service-img" src="/static/img/Paintbrush.png" alt="Category Icon">
+                            <p class="category-service-text">${nomeExibicao}</p>
+                        </div>
+                    `;
+                }).join('');
             } else {
                 categoriasHTML = '<div class="category-service"><p class="category-service-text">Sem categorias</p></div>';
             }
@@ -241,9 +491,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     <p class="service-description" title="${descricao}">
                         ${descricaoLimitada}
                     </p>
-                    <div class="qty-chronos-service">
+                    <div class="qty-chronos-service${classeTempoDestaque}">
                         <img class="qty-chronos-service-img" src="/static/img/Coin.png" alt="Chronos Icon">
-                        <p class="qty-chronos-service-text">${servico.timeChronos || 0} chronos</p>
+                        <p class="qty-chronos-service-text">${tempoServico} chronos</p>
                     </div>
                     <div class="categories-service">
                         ${categoriasHTML}
@@ -310,6 +560,13 @@ document.addEventListener("DOMContentLoaded", function () {
         // Armazena todos os serviços nas variáveis globais
         todosServicos = servicos;
         servicosFiltrados = [...servicos]; // Inicialmente mostra todos
+        
+        // Popular o datalist com as categorias dos serviços
+        popularCategoriasDatalist(servicos);
+        
+        // Inicializa botões
+        atualizarBotaoLimpar();
+        atualizarBotaoLimparTempo();
         
         // Exibe todos os serviços inicialmente
         exibirServicos(servicosFiltrados);

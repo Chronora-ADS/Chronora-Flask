@@ -60,16 +60,25 @@
                         </select>
                     </div>
                     <div class="filter-item">
-                        <h3>Tempo </h3>
+                        <h3>Tempo (chronos)</h3>
                         <div class="slider-container">
-                            <input type="range" id="tempo-slider" min="5" max="100" step="5" value="5">
-                            <span id="tooltip" class="tooltip">0-5</span>
+                            <div class="slider-wrapper">
+                                <input type="range" id="tempo-slider" min="5" max="100" step="5" value="5">
+                                <span id="tooltip" class="tooltip">0-5</span>
+                            </div>
+                            <button id="btn-aplicar-tempo" class="btn-aplicar-tempo" title="Aplicar filtro de tempo">OK</button>
+                            <button id="btn-limpar-tempo" class="btn-limpar-tempo" title="Limpar filtro de tempo">×</button>
                         </div>
+                        <div id="tempo-selecionado" class="tempo-selecionado"></div>
                     </div>
                     <div class="filter-item">
                         <h3>Categorias</h3>
-                        <input list="categorias-lista" id="filtro-categorias" name="categorias" placeholder="Digite ou escolha">
-                        <datalist id="categorias-lista"></datalist>
+                        <div class="category-filter-container">
+                            <input list="categorias-lista" id="filtro-categorias" name="categorias" placeholder="Digite ou escolha">
+                            <datalist id="categorias-lista"></datalist>
+                            <button id="btn-limpar-categoria" class="btn-limpar-categoria" title="Limpar filtro">×</button>
+                        </div>
+                        <div id="categoria-selecionada" class="categoria-selecionada"></div>
                     </div>
                     <div class="filter-item">
                         <h3>Ordenação</h3>
