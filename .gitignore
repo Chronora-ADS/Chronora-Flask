@@ -1,0 +1,22 @@
+# Ambiente virtual Python
+venv/
+.venv/
+.env/
+ENV/
+env.bak/
+venv.bak/
+Scripts/
+
+# Pipenv
+Pipfile.lock
+
+# PyInstaller
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Outros ambientes virtuais
+.vscode/
+.idea/
+*.swp
+*.swo
