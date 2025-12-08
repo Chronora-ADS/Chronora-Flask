@@ -294,6 +294,68 @@ document.addEventListener("DOMContentLoaded", function () {
         atualizarBotaoLimpar();
     }
 
+    // ----- ORDENAÇÃO DE SERVIÇOS -----
+    const selectOrdenacao = document.getElementById("filtro-ordenacao");
+
+    // Função para ordenar serviços com base na opção selecionada
+    function ordenarServicos(servicos, opcao) {
+        // Cria uma cópia do array para não modificar o original
+        const servicosOrdenados = [...servicos];
+        
+        switch(opcao) {
+            case "0": // Mais recentes (mantém como está - baseado no que o backend retorna)
+                return servicosOrdenados;
+                
+            case "1": // Mais antigos (inverte a ordem atual)
+                return servicosOrdenados.reverse();
+                
+            case "2": // Melhores avaliados (se tiver avaliação)
+                return servicosOrdenados.sort((a, b) => {
+                    const avaliacaoA = a.rating || 0;
+                    const avaliacaoB = b.rating || 0;
+                    return avaliacaoB - avaliacaoA; // Descendente
+                });
+                
+            case "3": // Maior tempo (chronos)
+                return servicosOrdenados.sort((a, b) => {
+                    const tempoA = a.timeChronos || 0;
+                    const tempoB = b.timeChronos || 0;
+                    return tempoB - tempoA; // Descendente (maior primeiro)
+                });
+                
+            case "4": // Menor tempo (chronos)
+                return servicosOrdenados.sort((a, b) => {
+                    const tempoA = a.timeChronos || 0;
+                    const tempoB = b.timeChronos || 0;
+                    return tempoA - tempoB; // Ascendente (menor primeiro)
+                });
+                
+            default:
+                return servicosOrdenados;
+        }
+    }
+
+    // Função para aplicar a ordenação
+    function aplicarOrdenacao() {
+        if (selectOrdenacao && servicosFiltrados.length > 0) {
+            const opcaoSelecionada = selectOrdenacao.value;
+            console.log(`Aplicando ordenação: opção ${opcaoSelecionada}`);
+            
+            // Ordena os serviços filtrados
+            const servicosOrdenados = ordenarServicos(servicosFiltrados, opcaoSelecionada);
+            
+            // Exibe os serviços ordenados
+            exibirServicos(servicosOrdenados);
+        }
+    }
+
+    // Configurar evento para a ordenação
+    if (selectOrdenacao) {
+        selectOrdenacao.addEventListener("change", function() {
+            aplicarOrdenacao();
+        });
+    }
+
     // ----- PESQUISA DE SERVIÇOS -----
     const inputSearchBar = document.getElementById("input-search-bar");
     
@@ -319,6 +381,11 @@ document.addEventListener("DOMContentLoaded", function () {
             return titulo.toLowerCase().includes(termoLowerCase) || 
                    descricao.toLowerCase().includes(termoLowerCase);
         });
+        
+        // Aplica a ordenação novamente após a filtragem por termo
+        if (selectOrdenacao && selectOrdenacao.value !== "0") {
+            servicosFiltrados = ordenarServicos(servicosFiltrados, selectOrdenacao.value);
+        }
         
         exibirServicos(servicosFiltrados);
     }
@@ -350,6 +417,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         
         servicosFiltrados = servicosParaFiltrar;
+        
+        // Aplica ordenação se houver alguma selecionada
+        if (selectOrdenacao && selectOrdenacao.value !== "0") {
+            servicosFiltrados = ordenarServicos(servicosFiltrados, selectOrdenacao.value);
+        }
         
         // Aplica filtro de busca se houver
         const termoBusca = inputSearchBar?.value;
@@ -567,6 +639,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // Inicializa botões
         atualizarBotaoLimpar();
         atualizarBotaoLimparTempo();
+        
+        // Aplica ordenação inicial se houver seleção padrão
+        if (selectOrdenacao && selectOrdenacao.value !== "0") {
+            servicosFiltrados = ordenarServicos(servicosFiltrados, selectOrdenacao.value);
+        }
         
         // Exibe todos os serviços inicialmente
         exibirServicos(servicosFiltrados);

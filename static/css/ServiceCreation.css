@@ -413,6 +413,7 @@ textarea {
     text-align: center;
     justify-content: center;
     box-sizing: border-box;
+    transition: all 0.3s ease; /* Adicionada transição geral para todos os botões */
 }
 
 /* Botão de imagem - ESTILO BASE */
@@ -425,7 +426,6 @@ textarea {
     border: 3px solid var(--amarelo-um-pouco-escuro);
     justify-content: space-between;
     margin-top: 5px;
-    transition: all 0.3s ease;
 }
 
 /* Texto do botão de imagem */
@@ -455,26 +455,19 @@ textarea {
     color: var(--amarelo-um-pouco-escuro);
     border: 3px solid var(--amarelo-um-pouco-escuro);
     justify-content: center;
-    transition: all 0.3s ease;
 }
 
-/* Efeitos hover para os botões */
+/* Efeitos hover para os botões - APENAS TROCA DE COR (sem transform) */
 #btn-register:hover {
     background-color: #d4b300;
-    transform: translateY(-2px);
-    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.3);
 }
 
 .btn-cancel-link:hover {
     background-color: #f0f0f0;
-    transform: translateY(-2px);
-    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.3);
 }
 
 #btn-service-image:hover {
     background-color: #f9f9f9;
-    transform: translateY(-2px);
-    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.3);
 }
 
 #btn-service-image:hover .btn-text {

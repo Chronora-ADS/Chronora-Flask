@@ -646,3 +646,22 @@ input[type=range]::-ms-thumb {
     border-radius: 15px;
     margin-top: 20px;
 }
+
+/* Destaques para ordenação por tempo (opcional) */
+.service-card.maior-tempo-destaque {
+    border: 3px solid gold;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.service-card.maior-tempo-destaque-secundario {
+    border: 2px solid silver;
+}
+
+.service-card.menor-tempo-destaque {
+    border: 3px solid #4CAF50;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+}
+
+.service-card.menor-tempo-destaque-secundario {
+    border: 2px solid #8BC34A;
+}
