@@ -350,23 +350,26 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // COLETA AS CATEGORIAS DAS TAGS
+        // COLETA APENAS AS CATEGORIAS DAS TAGS (NÃO TODAS DO BANCO)
         const categoryElements = document.querySelectorAll('#category-tag-list .tag');
         const categories = Array.from(categoryElements).map(tag => {
             const categoryName = tag.textContent.replace('×', '').trim();
             return { name: categoryName };
         });
 
-        // Monta o payload
+        // IMPORTANTE: Verificar se as categorias estão corretas
+        console.log("Categorias sendo enviadas:", categories);
+        
+        // Monta o payload CORRETO - APENAS COM CATEGORIAS DO USUÁRIO
         const payload = {
             title,
             description,
             timeChronos,
-            categoryEntities: categories,
+            categoryEntities: categories, // APENAS AS CATEGORIAS CRIADAS
             serviceImage: serviceImageBase64
         };
 
-        console.log("Payload enviado:", payload);
+        console.log("Payload completo enviado:", JSON.stringify(payload, null, 2));
 
         const token = localStorage.getItem("auth_token");
         if (!token) {

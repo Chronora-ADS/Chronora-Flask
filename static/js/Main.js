@@ -163,8 +163,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         
         atualizarBotaoLimparTempo();
-        
-        // Aplica também os outros filtros se houverem
         aplicarFiltrosCombinados();
     }
 
@@ -361,40 +359,20 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Função para filtrar serviços por termo de busca
     function filtrarServicosPorTermo(termo) {
+        console.log(`Buscando por: "${termo}"`);
+        
         if (!termo || termo.trim() === "") {
+            // Se termo vazio, remove o filtro de busca e aplica outros filtros
             aplicarFiltrosCombinados();
             return;
         }
         
         const termoLowerCase = termo.toLowerCase().trim();
         
-        // Primeiro aplica filtros de categoria e tempo
-        aplicarFiltrosCombinados();
-        
-        // Depois filtra por termo de busca nos serviços já filtrados
-        const servicosComFiltros = [...servicosFiltrados];
-        servicosFiltrados = servicosComFiltros.filter(servico => {
-            const titulo = servico.title || '';
-            const descricao = servico.description || '';
-            
-            // Busca no título OU na descrição
-            return titulo.toLowerCase().includes(termoLowerCase) || 
-                   descricao.toLowerCase().includes(termoLowerCase);
-        });
-        
-        // Aplica a ordenação novamente após a filtragem por termo
-        if (selectOrdenacao && selectOrdenacao.value !== "0") {
-            servicosFiltrados = ordenarServicos(servicosFiltrados, selectOrdenacao.value);
-        }
-        
-        exibirServicos(servicosFiltrados);
-    }
-
-    // Função para aplicar todos os filtros combinados
-    function aplicarFiltrosCombinados() {
+        // Começa com todos os serviços
         let servicosParaFiltrar = [...todosServicos];
         
-        // Aplica filtro de categoria
+        // Aplica filtro de categoria se houver
         if (categoriaAtual) {
             servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
                 if (!servico.categoryEntities || servico.categoryEntities.length === 0) {
@@ -408,7 +386,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
         
-        // Aplica filtro de tempo
+        // Aplica filtro de tempo se houver
         if (tempoAtual) {
             servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
                 const tempoServico = servico.timeChronos || 0;
@@ -416,20 +394,24 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
         
-        servicosFiltrados = servicosParaFiltrar;
+        // Aplica filtro de busca
+        servicosFiltrados = servicosParaFiltrar.filter(servico => {
+            const titulo = servico.title || '';
+            const descricao = servico.description || '';
+            
+            // Busca no título E/OU na descrição
+            return titulo.toLowerCase().includes(termoLowerCase) || 
+                   descricao.toLowerCase().includes(termoLowerCase);
+        });
         
-        // Aplica ordenação se houver alguma selecionada
+        console.log(`Encontrados ${servicosFiltrados.length} serviços com o termo "${termo}"`);
+        
+        // Aplica ordenação se houver
         if (selectOrdenacao && selectOrdenacao.value !== "0") {
             servicosFiltrados = ordenarServicos(servicosFiltrados, selectOrdenacao.value);
         }
         
-        // Aplica filtro de busca se houver
-        const termoBusca = inputSearchBar?.value;
-        if (termoBusca && termoBusca.trim() !== "") {
-            filtrarServicosPorTermo(termoBusca);
-        } else {
-            exibirServicos(servicosFiltrados);
-        }
+        exibirServicos(servicosFiltrados);
     }
 
     // Adiciona evento de input para a barra de pesquisa
@@ -457,6 +439,55 @@ document.addEventListener("DOMContentLoaded", function () {
                 filtrarServicosPorTermo(inputSearchBar.value);
             });
         }
+    }
+
+    // ----- FUNÇÃO PARA APLICAR TODOS OS FILTROS COMBINADOS -----
+    function aplicarFiltrosCombinados() {
+        let servicosParaFiltrar = [...todosServicos];
+        
+        // Aplica filtro de categoria
+        if (categoriaAtual) {
+            servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
+                if (!servico.categoryEntities || servico.categoryEntities.length === 0) {
+                    return false;
+                }
+                
+                return servico.categoryEntities.some(cat => {
+                    if (!cat.name) return false;
+                    return cat.name.toLowerCase().includes(categoriaAtual.toLowerCase());
+                });
+            });
+        }
+        
+        // Aplica filtro de tempo
+        if (tempoAtual) {
+            servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
+                const tempoServico = servico.timeChronos || 0;
+                return tempoServico >= tempoAtual.min && tempoServico <= tempoAtual.max;
+            });
+        }
+        
+        // Aplica filtro de busca se houver
+        const termoBusca = inputSearchBar?.value;
+        if (termoBusca && termoBusca.trim() !== "") {
+            servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
+                const titulo = servico.title || '';
+                const descricao = servico.description || '';
+                const termoLowerCase = termoBusca.toLowerCase().trim();
+                
+                return titulo.toLowerCase().includes(termoLowerCase) || 
+                       descricao.toLowerCase().includes(termoLowerCase);
+            });
+        }
+        
+        servicosFiltrados = servicosParaFiltrar;
+        
+        // Aplica ordenação se houver alguma selecionada
+        if (selectOrdenacao && selectOrdenacao.value !== "0") {
+            servicosFiltrados = ordenarServicos(servicosFiltrados, selectOrdenacao.value);
+        }
+        
+        exibirServicos(servicosFiltrados);
     }
 
     // ----- EXIBIÇÃO DE SERVIÇOS -----
@@ -645,8 +676,15 @@ document.addEventListener("DOMContentLoaded", function () {
             servicosFiltrados = ordenarServicos(servicosFiltrados, selectOrdenacao.value);
         }
         
-        // Exibe todos os serviços inicialmente
-        exibirServicos(servicosFiltrados);
+        // Configura a busca se houver algo digitado
+        if (inputSearchBar && inputSearchBar.value.trim() !== "") {
+            setTimeout(() => {
+                filtrarServicosPorTermo(inputSearchBar.value);
+            }, 100);
+        } else {
+            // Exibe todos os serviços inicialmente
+            exibirServicos(servicosFiltrados);
+        }
     })
     .catch(error => {
         console.error("Erro completo ao carregar serviços:", error);
