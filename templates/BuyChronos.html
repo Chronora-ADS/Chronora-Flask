@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar Chronos - Chronora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ServiceCreation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
+    <style>
+        .chronos-calc {
+            background: #D9D9D9;
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            color: var(--preto);
+            font-size: 0.95rem;
+        }
+        .calc-row.total {
+            font-weight: bold;
+            font-size: 1.05rem;
+            color: var(--amarelo-um-pouco-escuro);
+            border-top: 1px solid rgba(0,0,0,0.15);
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        .calc-label { opacity: 0.7; }
+        #input-chronos-amount { text-align: center; font-size: 1.3rem; }
+        .max-info { color: #666; font-size: 0.82rem; text-align: center; margin-top: 4px; }
+        #btn-buy { flex: 1; padding: 13px; background: var(--amarelo-um-pouco-escuro); color: #fff; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        #btn-buy:hover { background: #b08800; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div id="container-header">
+        <div id="icon-left">
+            <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
+            <p id="icon-left-text">Chronora</p>
+        </div>
+        <div id="search-bar"></div>
+        <div id="navbar-buttons">
+            <div class="qty-chronos">
+                <img class="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
+                <p class="qty-chronos-text" id="user-chronos-display">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hexágonos -->
+    <div class="page-bg">
+        <img class="hex-deco" id="hex-sc-left"  src="{{ url_for('static', filename='img/Comb5.png') }}" alt="">
+        <img class="hex-deco" id="hex-sc-right" src="{{ url_for('static', filename='img/Comb6.png') }}" alt="">
+        <div class="gold-bar" id="sc-bar-r1"></div>
+        <div class="gold-bar" id="sc-bar-l1"></div>
+    </div>
+
+    <!-- Card do formulário -->
+    <div id="page-wrapper">
+        <div id="form-card">
+            <h1>Comprar Chronos</h1>
+            <form id="buy-form" autocomplete="off" novalidate>
+
+                <div class="form-group">
+                    <div class="field-with-error">
+                        <input type="number" id="input-chronos-amount" min="1" max="300" placeholder="Quantidade de Chronos" required autocomplete="off">
+                        <span class="error-symbol" id="amount-error">⊝</span>
+                    </div>
+                    <p class="max-info">Máximo 300 Chronos &nbsp;|&nbsp; R$ 2,50 cada</p>
+                </div>
+
+                <div class="chronos-calc">
+                    <div class="calc-row"><span class="calc-label">Subtotal</span><span id="calc-subtotal">R$ 0,00</span></div>
+                    <div class="calc-row"><span class="calc-label">Taxa (10%)</span><span id="calc-tax">R$ 0,00</span></div>
+                    <div class="calc-row total"><span>Total</span><span id="calc-total">R$ 0,00</span></div>
+                </div>
+
+                <div id="bottom-btns">
+                    <a href="{{ url_for('main_page') }}" class="btn-cancel-link">Cancelar</a>
+                    <button type="submit" id="btn-buy">Comprar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/BuyChronos.js') }}"></script>
+</body>
+</html>

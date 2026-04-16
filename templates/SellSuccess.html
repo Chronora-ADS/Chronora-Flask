@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venda Realizada - Chronora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
+    <style>
+        body { background-color: var(--preto); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .success-box { text-align: center; padding: 48px; background: #1a1a1a; border: 2px solid var(--amarelo-claro); border-radius: 20px; max-width: 420px; width: 90%; }
+        .success-icon { font-size: 4rem; margin-bottom: 16px; }
+        h1 { color: var(--amarelo-claro); margin-bottom: 12px; }
+        p { color: var(--branco); margin: 8px 0; font-size: 1rem; }
+        .detail { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+        .btn-home { display: inline-block; background: var(--amarelo-claro); color: #000; text-decoration: none; font-weight: bold; padding: 12px 32px; border-radius: 20px; margin-top: 28px; font-size: 1rem; }
+        .btn-home:hover { background: #e6c700; }
+    </style>
+</head>
+<body>
+    <div class="success-box">
+        <div class="success-icon">✅</div>
+        <h1>Venda Realizada!</h1>
+        <p>Você vendeu <strong id="qty-sold">0</strong> Chronos</p>
+        <p class="detail">Você recebe: <strong id="net-received">R$ 0,00</strong></p>
+        <p class="detail">PIX: <strong id="pix-key-display">—</strong></p>
+        <p class="detail">Novo saldo: <strong id="new-balance">0</strong> Chronos</p>
+        <a href="/home" class="btn-home">Voltar ao início</a>
+    </div>
+    <script>
+        const tx = JSON.parse(localStorage.getItem("last_transaction") || "{}");
+        if (tx.type === "sell") {
+            document.getElementById("qty-sold").textContent = tx.chronosSold || 0;
+            document.getElementById("net-received").textContent = `R$ ${(tx.net || 0).toFixed(2).replace('.', ',')}`;
+            document.getElementById("pix-key-display").textContent = tx.pixKey || "—";
+            document.getElementById("new-balance").textContent = tx.newBalance || 0;
+        }
+    </script>
+</body>
+</html>

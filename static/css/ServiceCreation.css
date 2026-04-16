@@ -199,6 +199,9 @@ body::-webkit-scrollbar { display: none; }
 }
 
 #btn-register,
+#btn-save,
+#btn-buy,
+#btn-sell,
 .btn-cancel-link {
     height: 54px;
     border-radius: 0;
@@ -212,7 +215,10 @@ body::-webkit-scrollbar { display: none; }
     text-decoration: none;
 }
 
-#btn-register {
+#btn-register,
+#btn-save,
+#btn-buy,
+#btn-sell {
     border: 0;
     background: var(--amarelo-um-pouco-escuro);
     color: #fff;

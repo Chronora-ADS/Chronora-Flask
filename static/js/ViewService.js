@@ -1,283 +1,185 @@
-// ViewService.js - Descrição começa ao lado da imagem e continua abaixo
-
+// ViewService.js
 document.addEventListener("DOMContentLoaded", function () {
-    // --- Obter ID do serviço da URL ---
-    function getServiceIdFromURL() {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('id');
+    const token = localStorage.getItem("auth_token");
+    const serviceId = new URLSearchParams(window.location.search).get('id');
+
+    // --- Saldo do usuário no header ---
+    async function loadUserChronos() {
+        if (!token) return;
+        try {
+            const res = await fetch("/user/get", { headers: { "Authorization": "Bearer " + token } });
+            if (res.ok) {
+                const user = await res.json();
+                const el = document.getElementById('user-chronos-display');
+                if (el) el.textContent = user.timeChronos ?? 0;
+            }
+        } catch (e) { console.error(e); }
     }
+    loadUserChronos();
 
     // --- Carregar dados do serviço ---
-    async function loadServiceData(serviceId) {
-        const token = localStorage.getItem("auth_token");
-        
+    async function loadServiceData(id) {
         if (!token) {
             alert("Você precisa estar logado para ver os detalhes do serviço.");
-            window.location.href = "http://127.0.0.1:5000/";
+            window.location.href = "/";
             return;
         }
-
         try {
-            const response = await fetch(`http://localhost:5000/service/get/${serviceId}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + token,
-                    "Content-Type": "application/json"
-                }
+            const res = await fetch(`/service/get/${id}`, {
+                headers: { "Authorization": "Bearer " + token }
             });
-
-            if (!response.ok) {
-                if (response.status === 401) {
+            if (!res.ok) {
+                if (res.status === 401) {
                     alert("Sessão expirada. Faça login novamente.");
                     localStorage.removeItem("auth_token");
                     localStorage.removeItem("user_id");
-                    window.location.href = "http://127.0.0.1:5000/";
+                    window.location.href = "/";
                     return;
                 }
-                throw new Error(`Erro HTTP: ${response.status}`);
+                throw new Error(`HTTP ${res.status}`);
             }
-
-            const serviceData = await response.json();
-            console.log("Dados do serviço:", serviceData);
-            updateServiceUI(serviceData);
-
-        } catch (error) {
-            console.error("Erro ao carregar serviço:", error);
+            const data = await res.json();
+            renderService(data);
+        } catch (err) {
+            console.error("Erro ao carregar serviço:", err);
             alert("Erro ao carregar os dados do serviço.");
         }
     }
 
-    // --- Atualizar a interface com os dados do serviço ---
-    function updateServiceUI(serviceData) {
-        // Título do serviço
-        const titleElement = document.getElementById('service-title');
-        if (titleElement && serviceData.title) {
-            titleElement.textContent = serviceData.title;
+    // --- Renderizar serviço ---
+    function renderService(d) {
+        // Título
+        const titleEl = document.getElementById('service-title');
+        if (titleEl) titleEl.textContent = d.title || '—';
+
+        // Imagem
+        const imgEl = document.getElementById('service-image');
+        if (imgEl && d.serviceImage) {
+            imgEl.src = `data:image/png;base64,${d.serviceImage}`;
+            imgEl.alt = d.title || 'Imagem do pedido';
         }
 
-        // Imagem do serviço
-        const serviceImage = document.getElementById('service-image');
-        if (serviceImage && serviceData.serviceImage) {
-            serviceImage.src = `data:image/png;base64,${serviceData.serviceImage}`;
-            serviceImage.alt = serviceData.title || 'Imagem do Serviço';
-        }
+        // Descrição
+        const descEl = document.getElementById('service-description');
+        if (descEl) descEl.textContent = d.description || '—';
 
-        // Quantidade de chronos
-        const chronosValueElement = document.getElementById('chronos-value');
-        if (chronosValueElement && serviceData.timeChronos) {
-            chronosValueElement.textContent = serviceData.timeChronos;
-        }
+        // Chronos
+        const chronosEl = document.getElementById('chronos-value');
+        if (chronosEl) chronosEl.textContent = d.timeChronos ?? '—';
 
-        // Tempo de postagem
-        const postTimeElement = document.getElementById('post-time');
-        if (postTimeElement) {
+        // Hora de postagem
+        const postTimeEl = document.getElementById('post-time');
+        if (postTimeEl) {
             const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            postTimeElement.textContent = `${hours}:${minutes}`;
-        }
-
-        // DESCRIÇÃO - dividida em duas partes
-        if (serviceData.description) {
-            const description = serviceData.description.trim();
-            
-            // PRIMEIRA LINHA (ao lado da imagem) - apenas a primeira frase
-            const firstLineElement = document.getElementById('description-first-line');
-            if (firstLineElement) {
-                // Encontra o primeiro ponto final
-                const firstPeriodIndex = description.indexOf('.');
-                
-                if (firstPeriodIndex > 0) {
-                    // Pega a primeira frase (até o primeiro ponto)
-                    const firstSentence = description.substring(0, firstPeriodIndex + 1);
-                    firstLineElement.innerHTML = `<strong>${firstSentence}</strong>`;
-                    
-                    // CONTINUAÇÃO (abaixo da imagem) - todo o restante
-                    const continuationElement = document.getElementById('description-continuation-full');
-                    if (continuationElement) {
-                        const continuationText = description.substring(firstPeriodIndex + 1).trim();
-                        continuationElement.textContent = continuationText;
-                    }
-                } else {
-                    // Se não há ponto, mostra tudo na primeira linha
-                    firstLineElement.innerHTML = `<strong>${description}</strong>`;
-                    
-                    // Esconde a continuação
-                    const continuationElement = document.getElementById('description-continuation-full');
-                    if (continuationElement) {
-                        continuationElement.style.display = 'none';
-                    }
-                }
-            }
+            postTimeEl.textContent = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
         }
 
         // Categorias
-        const categoriesContainer = document.getElementById('categories-container');
-        if (categoriesContainer && serviceData.categoryEntities) {
-            categoriesContainer.innerHTML = '';
-            
-            serviceData.categoryEntities.forEach(category => {
-                const categoryElement = document.createElement('div');
-                categoryElement.className = 'category-item';
-                categoryElement.innerHTML = `
-                    <img src="/static/img/Paintbrush.png" alt="Ícone Categoria">
-                    <span>${category.name || 'Categoria'}</span>
-                `;
-                categoriesContainer.appendChild(categoryElement);
-            });
-        } else if (categoriesContainer) {
-            // Se não há categorias
-            const categoryElement = document.createElement('div');
-            categoryElement.className = 'category-item';
-            categoryElement.innerHTML = `
-                <img src="/static/img/Paintbrush.png" alt="Ícone Categoria">
-                <span>Sem categorias</span>
-            `;
-            categoriesContainer.appendChild(categoryElement);
-        }
-
-        // Informações do usuário
-        const userNameElement = document.getElementById('user-name');
-        if (userNameElement && serviceData.userEntity && serviceData.userEntity.name) {
-            userNameElement.textContent = serviceData.userEntity.name;
-        }
-
-        // Avaliação do usuário
-        const userRatingElement = document.getElementById('user-rating');
-        if (userRatingElement) {
-            userRatingElement.textContent = "4.9";
-        }
-    }
-
-    // --- Lógica do botão de aceitar pedido ---
-    const acceptButton = document.getElementById('btn-accept-request');
-    if (acceptButton) {
-        acceptButton.addEventListener('click', async function() {
-            const serviceId = getServiceIdFromURL();
-            const token = localStorage.getItem("auth_token");
-            const userId = localStorage.getItem("user_id");
-            
-            if (!serviceId) {
-                alert("ID do serviço não encontrado.");
-                return;
-            }
-
-            if (!token || !userId) {
-                alert("Você precisa estar logado para aceitar um pedido.");
-                window.location.href = "http://127.0.0.1:5000/";
-                return;
-            }
-
-            // Confirmação do usuário
-            const confirmed = confirm("Tem certeza que deseja aceitar este pedido?");
-            if (!confirmed) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`http://localhost:5000/service/accept/${serviceId}`, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + token,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ userId: userId })
+        const catContainer = document.getElementById('categories-container');
+        if (catContainer) {
+            catContainer.innerHTML = '';
+            const cats = d.categoryEntities || [];
+            if (cats.length === 0) {
+                catContainer.innerHTML = `<span class="vs-category-tag"><img src="/static/img/Paintbrush.png" alt="">Sem categorias</span>`;
+            } else {
+                cats.forEach(cat => {
+                    const span = document.createElement('span');
+                    span.className = 'vs-category-tag';
+                    span.innerHTML = `<img src="/static/img/Paintbrush.png" alt="">${cat.name || 'Categoria'}`;
+                    catContainer.appendChild(span);
                 });
-
-                if (response.ok) {
-                    alert("Pedido aceito com sucesso!");
-                    window.location.href = "http://127.0.0.1:5000/home";
-                } else if (response.status === 404) {
-                    alert("Funcionalidade de aceitar pedido será implementada em breve!");
-                } else {
-                    const errorData = await response.json();
-                    alert(`Erro ao aceitar pedido: ${errorData.error || "Erro desconhecido"}`);
-                }
-            } catch (error) {
-                console.error("Erro ao aceitar pedido:", error);
-                alert("Funcionalidade de aceitar pedido será implementada em breve!");
             }
-        });
+        }
+
+        // Usuário
+        const userNameEl = document.getElementById('user-name');
+        if (userNameEl) userNameEl.textContent = d.userEntity?.name || '—';
+
+        // Prazo e modalidade
+        const metaBox = document.getElementById('service-meta-box');
+        const deadlineLine = document.getElementById('service-deadline-line');
+        const modalityLine = document.getElementById('service-modality-line');
+        let showMeta = false;
+        if (d.deadline && deadlineLine) {
+            const dt = new Date(d.deadline + 'T00:00:00');
+            deadlineLine.textContent = `Prazo: ${dt.toLocaleDateString('pt-BR')}`;
+            showMeta = true;
+        }
+        if (d.modality && modalityLine) {
+            modalityLine.textContent = `Modalidade: ${d.modality}`;
+            showMeta = true;
+        }
+        if (showMeta && metaBox) metaBox.style.display = 'block';
+
+        // Botões do dono
+        const currentUserId = parseInt(localStorage.getItem('user_id'));
+        const ownerActions = document.getElementById('owner-actions');
+        const acceptBtn = document.getElementById('btn-accept-request');
+        if (d.userEntity && d.userEntity.id === currentUserId) {
+            if (ownerActions) ownerActions.style.display = 'flex';
+            if (acceptBtn) acceptBtn.style.display = 'none';
+        }
     }
+
+    // --- Aceitar pedido ---
+    document.getElementById('btn-accept-request')?.addEventListener('click', async function () {
+        if (!serviceId) { alert("ID do serviço não encontrado."); return; }
+        if (!token) { alert("Você precisa estar logado para aceitar um pedido."); window.location.href = "/"; return; }
+        if (!confirm("Tem certeza que deseja aceitar este pedido?")) return;
+        try {
+            const res = await fetch(`/service/accept/${serviceId}`, {
+                method: "POST",
+                headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: localStorage.getItem("user_id") })
+            });
+            if (res.ok) { alert("Pedido aceito com sucesso!"); window.location.href = "/home"; }
+            else { const err = await res.json(); alert(`Erro: ${err.error || "Erro desconhecido"}`); }
+        } catch (e) {
+            console.error(e);
+            alert("Funcionalidade de aceitar pedido será implementada em breve!");
+        }
+    });
+
+    // --- Editar ---
+    document.getElementById('btn-edit-service')?.addEventListener('click', function () {
+        window.location.href = `/edit_service?id=${serviceId}`;
+    });
+
+    // --- Excluir ---
+    document.getElementById('btn-delete-service')?.addEventListener('click', async function () {
+        if (!confirm('Deseja realmente excluir este pedido?')) return;
+        try {
+            const res = await fetch(`/service/delete/${serviceId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (res.ok) { alert('Pedido excluído com sucesso!'); window.location.href = '/home'; }
+            else { const err = await res.json(); alert(`Erro: ${err.error || 'Não foi possível excluir.'}`); }
+        } catch (e) { console.error(e); alert('Erro ao excluir o pedido.'); }
+    });
 
     // --- Barra de pesquisa ---
-    const inputSearchBar = document.getElementById('input-search-bar');
-    if (inputSearchBar) {
-        inputSearchBar.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const searchTerm = this.value.trim();
-                if (searchTerm) {
-                    window.location.href = `http://127.0.0.1:5000/home?search=${encodeURIComponent(searchTerm)}`;
-                }
-            }
+    const searchInput = document.getElementById('input-search-bar');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && this.value.trim())
+                window.location.href = `/home?search=${encodeURIComponent(this.value.trim())}`;
         });
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        const searchParam = urlParams.get('search');
-        if (searchParam) {
-            inputSearchBar.value = decodeURIComponent(searchParam);
-        }
+        document.querySelector('.icon-search')?.addEventListener('click', function () {
+            if (searchInput.value.trim())
+                window.location.href = `/home?search=${encodeURIComponent(searchInput.value.trim())}`;
+        });
     }
 
-    // --- Carregar os dados do serviço quando a página carregar ---
-    const serviceId = getServiceIdFromURL();
+    // --- Init ---
     if (serviceId) {
         loadServiceData(serviceId);
     } else {
-        document.getElementById('container-content').innerHTML = `
-            <div style="
-                text-align: center; 
-                padding: 40px 20px;
-                background-color: rgba(181, 191, 174, 0.1);
-                border-radius: 12px;
-                margin-top: 30px;
-                border: 2px solid var(--amarelo-claro);
-            ">
-                <h2 style="color: var(--amarelo-claro); font-size: 1.6rem; margin-bottom: 12px;">
-                    Serviço não encontrado
-                </h2>
-                <p style="color: var(--branco); margin: 12px 0; font-size: 0.95rem; line-height: 1.5;">
-                    O ID do serviço não foi especificado ou é inválido.
-                </p>
-                <a href="http://127.0.0.1:5000/home" style="
-                    display: inline-block;
-                    background-color: var(--amarelo-claro);
-                    color: var(--preto);
-                    text-decoration: none;
-                    font-weight: bold;
-                    padding: 10px 30px;
-                    border-radius: 20px;
-                    font-size: 1rem;
-                    margin-top: 20px;
-                    transition: all 0.3s ease;
-                " onmouseover="this.style.backgroundColor='var(--amarelo-um-pouco-escuro)'; this.style.transform='translateY(-2px)'"
-                   onmouseout="this.style.backgroundColor='var(--amarelo-claro)'; this.style.transform='translateY(0)'">
-                    Voltar para a página principal
-                </a>
-            </div>
-        `;
-    }
-
-    // --- Atualizar quantidade de chronos do usuário (no header) ---
-    function updateUserChronos() {
-        const savedChronos = localStorage.getItem('user_chronos') || '123';
-        const chronosElements = document.querySelectorAll('.qty-chronos-text');
-        
-        chronosElements.forEach(element => {
-            element.textContent = savedChronos;
-        });
-    }
-
-    // Inicializar
-    updateUserChronos();
-    
-    // Adicionar funcionalidade ao ícone de busca
-    const searchIcon = document.querySelector('.icon-search');
-    if (searchIcon) {
-        searchIcon.addEventListener('click', function() {
-            if (inputSearchBar.value.trim()) {
-                window.location.href = `http://127.0.0.1:5000/home?search=${encodeURIComponent(inputSearchBar.value)}`;
-            }
-        });
+        document.getElementById('vs-wrapper').innerHTML = `
+            <div style="text-align:center;padding:60px 20px;color:#fff;">
+                <h2 style="color:var(--amarelo-claro);">Serviço não encontrado</h2>
+                <p style="color:rgba(255,255,255,0.6);margin:12px 0;">O ID do serviço não foi especificado.</p>
+                <a href="/home" style="display:inline-block;background:var(--amarelo-claro);color:#000;text-decoration:none;font-weight:bold;padding:10px 30px;border-radius:30px;margin-top:16px;">Voltar ao início</a>
+            </div>`;
     }
 });

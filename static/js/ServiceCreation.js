@@ -360,11 +360,16 @@ document.addEventListener("DOMContentLoaded", function () {
         // IMPORTANTE: Verificar se as categorias estão corretas
         console.log("Categorias sendo enviadas:", categories);
         
+        const deadline = document.getElementById("input-deadline")?.value || null;
+        const modality = document.getElementById("input-modality")?.value || null;
+
         // Monta o payload CORRETO - APENAS COM CATEGORIAS DO USUÁRIO
         const payload = {
             title,
             description,
             timeChronos,
+            deadline: deadline || null,
+            modality: modality || null,
             categoryEntities: categories, // APENAS AS CATEGORIAS CRIADAS
             serviceImage: serviceImageBase64
         };

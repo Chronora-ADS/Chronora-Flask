@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Pedido - Chronora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ServiceCreation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <div id="container-header">
+        <div id="icon-left">
+            <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
+            <p id="icon-left-text">Chronora</p>
+        </div>
+        <div id="search-bar"></div>
+        <div id="navbar-buttons">
+            <div class="qty-chronos">
+                <img class="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
+                <p class="qty-chronos-text" id="user-chronos-display">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hexágonos -->
+    <div class="page-bg">
+        <img class="hex-deco" id="hex-sc-left"  src="{{ url_for('static', filename='img/Comb5.png') }}" alt="">
+        <img class="hex-deco" id="hex-sc-right" src="{{ url_for('static', filename='img/Comb6.png') }}" alt="">
+        <div class="gold-bar" id="sc-bar-r1"></div>
+        <div class="gold-bar" id="sc-bar-l1"></div>
+    </div>
+
+    <!-- Card do formulário -->
+    <div id="page-wrapper">
+        <div id="form-card">
+            <h1>Editar Pedido</h1>
+            <form id="register-form" autocomplete="off" novalidate>
+
+                <div class="form-group">
+                    <div class="field-with-error">
+                        <input type="text" id="input-title" placeholder="Título" required autocomplete="off">
+                        <span class="error-symbol" id="title-error">⊝</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="field-with-error">
+                        <textarea id="input-description" placeholder="Descrição" required autocomplete="off"></textarea>
+                        <span class="error-symbol" id="description-error">⊝</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="field-with-error">
+                        <input type="number" min="1" max="100" id="input-time-chronos" placeholder="Tempo em Chronos" required autocomplete="off">
+                        <span class="error-symbol" id="time-error">⊝</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="field-with-error">
+                        <input type="text" id="input-category" placeholder="Categoria(s) — aperte Enter" autocomplete="off">
+                        <span class="error-symbol" id="category-error">⊝</span>
+                    </div>
+                    <div id="category-tag-list" class="tag-list"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="field-with-error two-col">
+                        <input type="date" id="input-deadline" autocomplete="off">
+                        <select id="input-modality">
+                            <option value="">Modalidade</option>
+                            <option value="Presencial">Presencial</option>
+                            <option value="Remoto">Remoto</option>
+                            <option value="Híbrido">Híbrido</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="file" id="input-service-image" accept=".jpg,.jpeg,.png" style="display:none;">
+                    <button type="button" id="btn-service-image">
+                        <span class="btn-text">Alterar imagem (opcional)</span>
+                        <img src="{{ url_for('static', filename='img/AddImage.png') }}" alt="" id="icon-service-image">
+                    </button>
+                    <span id="service-image-chosen"></span>
+                </div>
+
+                <div id="bottom-btns">
+                    <a id="btn-cancel" class="btn-cancel-link" href="#">Cancelar</a>
+                    <button type="submit" id="btn-save">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/EditService.js') }}"></script>
+</body>
+</html>

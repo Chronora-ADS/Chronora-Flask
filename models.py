@@ -55,6 +55,7 @@ class User(db.Model):
     phone_number = db.Column(db.BigInteger, unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     roles = db.Column(db.JSON, default=['user']) # Armazena como JSON
+    time_chronos = db.Column(db.Integer, nullable=False, default=0)
 
     # Relacionamento com Documento (um usuário tem um documento)
     # A chave estrangeira está em Document, não aqui em User.
@@ -79,7 +80,8 @@ class User(db.Model):
             'id': self.id,
             'name': self.name,
             'email': self.email,
-            'phone_number': self.phone_number,
+            'phoneNumber': self.phone_number,
+            'timeChronos': self.time_chronos,
             'roles': self.roles
         }
         # Inclui documento apenas se necessário (ex: rota específica de perfil)
@@ -96,6 +98,8 @@ class Service(db.Model):
     description = db.Column(db.Text, nullable=False)
     time_chronos = db.Column(db.Integer, nullable=False)
     service_image = db.Column(db.LargeBinary, nullable=False)
+    deadline = db.Column(db.Date, nullable=True)
+    modality = db.Column(db.String(20), nullable=True)  # Presencial, Remoto, Híbrido
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user_entity = db.relationship('User', back_populates='services')
 
@@ -111,11 +115,12 @@ class Service(db.Model):
             'description': self.description,
             'timeChronos': self.time_chronos,
             'serviceImage': image_base64,
+            'deadline': self.deadline.isoformat() if self.deadline else None,
+            'modality': self.modality,
             'userEntity': {
                 'id': self.user_entity.id,
                 'name': self.user_entity.name,
                 'email': self.user_entity.email
             },
-            # Inclui categorias no retorno
             'categoryEntities': [{'id': cat.id, 'name': cat.name} for cat in self.categories]
         }

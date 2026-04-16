@@ -26,7 +26,7 @@ CORS(app, resources={
     r"/*": {
         "origins": ["http://localhost:5000", "http://127.0.0.1:5000"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"]
+        "allow_headers": ["Content-Type", "Authorization", "Chronos"]
     }
 })
 
@@ -53,6 +53,26 @@ def service_creation_page():
 @app.route('/view_service')
 def view_service_page():
     return render_template('ViewService.html')
+
+@app.route('/buy_chronos')
+def buy_chronos_page():
+    return render_template('BuyChronos.html')
+
+@app.route('/sell_chronos')
+def sell_chronos_page():
+    return render_template('SellChronos.html')
+
+@app.route('/buy_success')
+def buy_success_page():
+    return render_template('BuySuccess.html')
+
+@app.route('/sell_success')
+def sell_success_page():
+    return render_template('SellSuccess.html')
+
+@app.route('/edit_service')
+def edit_service_page():
+    return render_template('EditService.html')
 
 # Rota de health check
 @app.route('/health')
