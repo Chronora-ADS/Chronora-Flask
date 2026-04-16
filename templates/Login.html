@@ -3,43 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Login</title>
-    <!-- Atualiza os caminhos para usar a função url_for do Flask -->
+    <title>Login - Chronora</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/Login.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
 </head>
 <body>
     <div id="container">
-        <div id="container-background">
-            <img class="background" id="triangle-left" src="{{ url_for('static', filename='img/TriangleLeft.png') }}" alt="">
-            <div class="background" id="icon-left">
-                <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
-                <p id="icon-left-text">Chronora</p>
-            </div>
-            <img class="background" id="bar-right" src="{{ url_for('static', filename='img/BarDescending.png') }}" alt="">
-            <img class="background" id="bar-left" src="{{ url_for('static', filename='img/BarAscending.png') }}" alt="">
-            <img class="background" id="comb-right" src="{{ url_for('static', filename='img/Comb1.png') }}" alt="">
-            <img class="background" id="comb-left" src="{{ url_for('static', filename='img/Comb2.png') }}" alt="">
+        <!-- Fundo decorativo -->
+        <div class="page-bg-auth">
+            <img id="triangle-left" src="{{ url_for('static', filename='img/TriangleLeft.png') }}" alt="">
+            <!-- Hexágonos -->
+            <img class="hex" id="hex-left" src="{{ url_for('static', filename='img/Comb2.png') }}" alt="">
+            <img class="hex" id="hex-right" src="{{ url_for('static', filename='img/Comb1.png') }}" alt="">
+            <!-- Retângulos dourados direita -->
+            <div class="gold-bar" id="bar-r1"></div>
+            <div class="gold-bar" id="bar-r2"></div>
+            <div class="gold-bar" id="bar-r3"></div>
+            <!-- Retângulos dourados esquerda-baixo -->
+            <div class="gold-bar" id="bar-l1"></div>
+            <div class="gold-bar" id="bar-l2"></div>
         </div>
+
+        <!-- Logo no canto superior esquerdo -->
+        <div id="logo-area">
+            <img src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="Logo" id="logo-img">
+            <span id="logo-text">Chronora</span>
+        </div>
+
+        <!-- Card do formulário -->
         <div id="container-form">
-            <h1>Bem vindo de volta!</h1>
+            <h1>Bem vindo!</h1>
             <form id="login-form">
-                <input type="email" name="email" id="input-email" placeholder="E-mail" required>
+                <input type="email" name="email" id="input-email" placeholder="CPF" required autocomplete="off">
                 <input type="password" name="senha" id="input-password" placeholder="Senha" required>
 
                 <div id="bottom-inputs-container">
-                    <input type="checkbox" name="remember-me" id="checkbox-remeber-me" class="checkbox">
-                    <label for="checkbox-remeber-me">Lembre-se de mim</label>
-                    <a href="#" id="a-forgot-password">Esqueceu a senha?</a> <!-- Link temporário -->
+                    <div class="remember-row">
+                        <input type="checkbox" name="remember-me" id="checkbox-remember" class="checkbox">
+                        <label for="checkbox-remember">Lembre-se de mim</label>
+                    </div>
+                    <a href="#" id="a-forgot-password">Esqueceu a senha?</a>
                 </div>
 
                 <button type="submit" id="btn-login">Entrar</button>
             </form>
-
-            <a href="{{ url_for('register_page') }}" id="a-register"><button id="btn-register">Criar Conta</button></a> <!-- Link para Registro Flask -->
+            <a href="{{ url_for('register_page') }}" id="a-register">
+                <button id="btn-register">Criar conta</button>
+            </a>
         </div>
     </div>
-    <!-- Atualiza o caminho do script JS -->
     <script src="{{ url_for('static', filename='js/Login.js') }}"></script>
 </body>
 </html>

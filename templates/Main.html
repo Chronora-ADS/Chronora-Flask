@@ -3,98 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Atualiza os caminhos para usar a função url_for do Flask -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/Main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
-    <title>Página Inicial</title>
+    <title>Página Inicial - Chronora</title>
 </head>
 <body>
-    <div id="container">
-        <div id="container-header">
-            <div id="icon-left">
-                <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
-                <p id="icon-left-text">Chronora</p>
+    <div id="side-drawer" class="drawer">
+        <button id="btn-close-drawer" class="btn-close-drawer">×</button>
+        <nav class="drawer-nav">
+            <a href="{{ url_for('main_page') }}" class="drawer-link">Início</a>
+            <a href="{{ url_for('service_creation_page') }}" class="drawer-link">Criar Pedido</a>
+            <a href="{{ url_for('buy_chronos_page') }}" class="drawer-link">Comprar Chronos</a>
+            <a href="{{ url_for('sell_chronos_page') }}" class="drawer-link">Vender Chronos</a>
+            <a href="#" id="drawer-logout" class="drawer-link drawer-link-logout">Sair</a>
+        </nav>
+    </div>
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+
+    <div id="wallet-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>Carteira</h2>
+            <p>Saldo: <span id="modal-chronos-value">0</span> Chronos</p>
+            <div class="modal-actions">
+                <a href="{{ url_for('buy_chronos_page') }}" class="btn-modal-action">Comprar Chronos</a>
+                <a href="{{ url_for('sell_chronos_page') }}" class="btn-modal-action btn-modal-sell">Vender Chronos</a>
             </div>
-            <div id="search-bar">
-                <div class="search-container">
-                    <input type="text" name="search-bar" placeholder="Pintura de parede, aula de inglês..." id="input-search-bar">
-                    <img src="{{ url_for('static', filename='img/Search.png') }}" alt="" class="icon-search">
-                </div>
-            </div>
-            <div id="navbar-buttons">
-                <a class="navbar-a" href="{{ url_for('service_creation_page') }}"><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a>
-                <div class="qty-chronos">
-                    <img class="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
-                    <p class="qty-chronos-text">123</p> <!-- Valor fixo ou dinâmico -->
-                </div>
-                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Briefcase.png') }}" alt=""></a>
-                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Profile.png') }}" alt=""></a>
-                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Settings.png') }}" alt=""></a>
-            </div>
-        </div>
-        <div id="container-background">
-            <img class="background" id="comb-left" src="{{ url_for('static', filename='img/Comb3.png') }}" alt="">
-            <img class="background" id="comb-right" src="{{ url_for('static', filename='img/Comb4.png') }}" alt="">
-        </div>
-        <div id="container-form">
-            <div id="container-makerequest">
-                <div id="makerequest-content">
-                    <h3>As horas acumuladas no seu banco representam oportunidades reais de ação.</h3>
-                    <div id="makerequest-btn">
-                        <a id="add-service-a" href="{{ url_for('service_creation_page') }}">Faça um pedido<img src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a> <!-- Link para Criação de Serviço Flask -->
-                    </div>
-                    <h3>Ou realize o de alguém</h3>
-                    <img src="{{ url_for('static', filename='img/White Lines.png') }}" alt="" id="white-lines">
-                </div>
-            </div>
-            <div id="container-requests">
-                <div id="requests-filter">
-                    <div class="filter-item">
-                        <h3>Avaliação de usuário</h3>
-                        <select name="avaliacao" id="filtro-avaliacao">
-                            <option value="0">0 - 1 estrelas</option>
-                            <option value="1">1 - 2 estrelas</option>
-                            <option value="2">2 - 3 estrelas</option>
-                            <option value="3">3 - 4 estrelas</option>
-                            <option value="4">4 - 5 estrelas</option>
-                        </select>
-                    </div>
-                    <div class="filter-item">
-                        <h3>Tempo (chronos)</h3>
-                        <div class="slider-container">
-                            <div class="slider-wrapper">
-                                <input type="range" id="tempo-slider" min="5" max="100" step="5" value="5">
-                                <span id="tooltip" class="tooltip">0-5</span>
-                            </div>
-                            <button id="btn-aplicar-tempo" class="btn-aplicar-tempo" title="Aplicar filtro de tempo">OK</button>
-                            <button id="btn-limpar-tempo" class="btn-limpar-tempo" title="Limpar filtro de tempo">×</button>
-                        </div>
-                        <div id="tempo-selecionado" class="tempo-selecionado"></div>
-                    </div>
-                    <div class="filter-item">
-                        <h3>Categorias</h3>
-                        <div class="category-filter-container">
-                            <input list="categorias-lista" id="filtro-categorias" name="categorias" placeholder="Digite ou escolha">
-                            <datalist id="categorias-lista"></datalist>
-                            <button id="btn-limpar-categoria" class="btn-limpar-categoria" title="Limpar filtro">×</button>
-                        </div>
-                        <div id="categoria-selecionada" class="categoria-selecionada"></div>
-                    </div>
-                    <div class="filter-item">
-                        <h3>Ordenação</h3>
-                        <select name="ordenacao" id="filtro-ordenacao">
-                            <option value="0">Mais recentes</option>
-                            <option value="1">Mais antigos</option>
-                            <option value="2">Melhores avaliados</option>
-                            <option value="3">Maior tempo</option>
-                            <option value="4">Menor tempo</option>
-                        </select>
-                    </div>
-                </div>
-            <div id="requests"></div> <!-- Aqui os cards de serviço serão inseridos pelo JS -->
+            <button id="btn-close-modal" class="btn-close-modal">Fechar</button>
         </div>
     </div>
-    <!-- Atualiza os caminhos dos scripts JS -->
+
+    <div id="container-header">
+        <div id="icon-left">
+            <button id="btn-open-drawer" class="btn-hamburger" aria-label="Abrir menu">☰</button>
+            <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
+            <p id="icon-left-text">Chronora</p>
+        </div>
+        <div id="search-bar">
+            <div class="search-container">
+                <input type="text" placeholder="Pintura de parede, aula de inglês..." id="input-search-bar">
+                <img src="{{ url_for('static', filename='img/Search.png') }}" alt="" class="icon-search">
+            </div>
+        </div>
+        <div id="navbar-buttons">
+            <a class="navbar-a" href="{{ url_for('service_creation_page') }}" title="Criar pedido">
+                <img class="navbar-buttons-img" src="{{ url_for('static', filename='img/Plus.png') }}" alt="">
+            </a>
+            <div class="qty-chronos" id="btn-open-wallet" title="Carteira">
+                <img class="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
+                <p class="qty-chronos-text">0</p>
+            </div>
+            <a class="navbar-a" href="" title="Pedidos"><img class="navbar-buttons-img" src="{{ url_for('static', filename='img/Briefcase.png') }}" alt=""></a>
+            <a class="navbar-a" href="" title="Perfil"><img class="navbar-buttons-img" src="{{ url_for('static', filename='img/Profile.png') }}" alt=""></a>
+            <a class="navbar-a" href="" title="Configurações"><img class="navbar-buttons-img" src="{{ url_for('static', filename='img/Settings.png') }}" alt=""></a>
+        </div>
+    </div>
+
+    <div class="page-bg">
+        <img class="hex-deco" id="hex-main-left" src="{{ url_for('static', filename='img/Comb3.png') }}" alt="">
+        <img class="hex-deco" id="hex-main-right" src="{{ url_for('static', filename='img/Comb4.png') }}" alt="">
+    </div>
+
+    <div id="main-content">
+        <div id="hero-section">
+            <p id="hero-text">As horas acumuladas no seu banco representam oportunidades reais de ação.</p>
+            <a href="{{ url_for('service_creation_page') }}" id="btn-crie-pedido">
+                Crie um pedido <img src="{{ url_for('static', filename='img/Plus.png') }}" alt="" id="icon-plus-hero">
+            </a>
+            <p id="hero-sub">ou realize o de alguém</p>
+        </div>
+
+        <div id="requests-filter">
+            <div class="filter-item">
+                <label for="filtro-avaliacao">Avaliação do usuário</label>
+                <select id="filtro-avaliacao">
+                    <option value="4">> 4 estrelas</option>
+                    <option value="5">5 estrelas</option>
+                    <option value="3">> 3 estrelas</option>
+                    <option value="">Todas</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="filtro-tempo-select">Tempo</label>
+                <select id="filtro-tempo-select">
+                    <option value="1-5">1-5 Chronos</option>
+                    <option value="6-25">6-25 Chronos</option>
+                    <option value="26-50">26-50 Chronos</option>
+                    <option value="51-100">51-100 Chronos</option>
+                    <option value="">Todos</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="filtro-categorias">Categorias</label>
+                <div class="category-filter-container">
+                    <input list="categorias-lista" id="filtro-categorias" placeholder="Pinturas gerais">
+                    <datalist id="categorias-lista"></datalist>
+                    <button id="btn-limpar-categoria" class="btn-limpar-categoria" title="Limpar">×</button>
+                </div>
+                <div id="categoria-selecionada" class="categoria-selecionada"></div>
+            </div>
+            <div class="filter-item">
+                <label for="filtro-ordenacao">Ordenação</label>
+                <select id="filtro-ordenacao">
+                    <option value="0">Mais recentes</option>
+                    <option value="1">Mais antigos</option>
+                    <option value="2">Melhores avaliados</option>
+                    <option value="3">Maior tempo</option>
+                    <option value="4">Menor tempo</option>
+                    <option value="5">Prazo mais próximo</option>
+                    <option value="6">Prazo mais distante</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="requests"></div>
+    </div>
+
     <script src="{{ url_for('static', filename='js/Main.js') }}"></script>
 </body>
 </html>

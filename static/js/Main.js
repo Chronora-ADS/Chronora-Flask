@@ -1,69 +1,110 @@
 // Main.js
 document.addEventListener("DOMContentLoaded", function () {
-    // Variáveis globais para armazenar serviços
+    const token = localStorage.getItem("auth_token");
+
+    // ----- CARREGAR SALDO DO USUÁRIO -----
+    async function loadUserChronos() {
+        if (!token) return;
+        try {
+            const response = await fetch("/user/get", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (response.ok) {
+                const user = await response.json();
+                const saldo = user.timeChronos ?? 0;
+                document.querySelectorAll(".qty-chronos-text").forEach(el => {
+                    el.textContent = saldo;
+                });
+                document.getElementById("modal-chronos-value").textContent = saldo;
+                localStorage.setItem("user_chronos", saldo);
+                localStorage.setItem("user_name", user.name || "");
+            }
+        } catch (e) {
+            console.error("Erro ao carregar Chronos:", e);
+        }
+    }
+    loadUserChronos();
+
+    // ----- SIDE DRAWER -----
+    const drawer = document.getElementById("side-drawer");
+    const drawerOverlay = document.getElementById("drawer-overlay");
+    const btnOpenDrawer = document.getElementById("btn-open-drawer");
+    const btnCloseDrawer = document.getElementById("btn-close-drawer");
+
+    function openDrawer() {
+        drawer.classList.add("open");
+        drawerOverlay.classList.add("visible");
+    }
+    function closeDrawer() {
+        drawer.classList.remove("open");
+        drawerOverlay.classList.remove("visible");
+    }
+    if (btnOpenDrawer) btnOpenDrawer.addEventListener("click", openDrawer);
+    if (btnCloseDrawer) btnCloseDrawer.addEventListener("click", closeDrawer);
+    if (drawerOverlay) drawerOverlay.addEventListener("click", closeDrawer);
+
+    document.getElementById("drawer-logout")?.addEventListener("click", function (e) {
+        e.preventDefault();
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user_id");
+        localStorage.removeItem("user_chronos");
+        window.location.href = "/";
+    });
+
+    // ----- WALLET MODAL -----
+    const walletModal = document.getElementById("wallet-modal");
+    const btnOpenWallet = document.getElementById("btn-open-wallet");
+    const btnCloseModal = document.getElementById("btn-close-modal");
+
+    if (btnOpenWallet) btnOpenWallet.addEventListener("click", function () {
+        walletModal.classList.add("visible");
+    });
+    if (btnCloseModal) btnCloseModal.addEventListener("click", function () {
+        walletModal.classList.remove("visible");
+    });
+    walletModal?.addEventListener("click", function (e) {
+        if (e.target === walletModal) walletModal.classList.remove("visible");
+    });
+
+    // ----- VARIÁVEIS GLOBAIS -----
     let todosServicos = [];
     let servicosFiltrados = [];
-    let categoriaAtual = null; // Armazena a categoria selecionada atualmente
-    let tempoAtual = null; // Armazena o intervalo de tempo selecionado atual {min, max}
+    let categoriaAtual = null;
+    let tempoAtual = null;
+    let avaliacaoAtual = 4;
+    let modalidadeAtual = "";
 
-    // ----- TAG DE CATEGORIAS -----
-    const inputCategory = document.getElementById('input-category');
-    const tagList = document.getElementById('category-tag-list');
+    const selectAvaliacao = document.getElementById("filtro-avaliacao");
+    if (selectAvaliacao) {
+        selectAvaliacao.addEventListener("change", function () {
+            avaliacaoAtual = this.value === "" ? null : parseFloat(this.value);
+            aplicarFiltrosCombinados();
+        });
+    }
 
-    if (inputCategory && tagList) {
-        inputCategory.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' && inputCategory.value.trim() !== "") {
-                e.preventDefault();
-                const category = inputCategory.value.trim();
-
-                const tag = document.createElement('span');
-                tag.className = 'tag';
-                tag.innerHTML = `
-                    ${category}
-                    <span class="remove-tag" onclick="removeTag(this)">×</span>
-                `;
-                tagList.appendChild(tag);
-
-                inputCategory.value = "";
+    const selectTempo = document.getElementById("filtro-tempo-select");
+    if (selectTempo) {
+        function atualizarTempoPorSelect() {
+            if (!selectTempo.value) {
+                tempoAtual = null;
+            } else {
+                const [min, max] = selectTempo.value.split("-").map(Number);
+                tempoAtual = { min, max };
             }
-        });
+            aplicarFiltrosCombinados();
+        }
+        selectTempo.addEventListener("change", atualizarTempoPorSelect);
+        const [min, max] = selectTempo.value.split("-").map(Number);
+        tempoAtual = { min, max };
     }
 
-    // Função global para remover tag
-    window.removeTag = function (element) {
-        element.parentElement.remove();
-    }
-
-    // Extrai todas as categorias únicas dos serviços
-    function extrairCategoriasUnicas(servicos) {
-        const categorias = new Set();
-        servicos.forEach(servico => {
-            if (servico.categoryEntities && servico.categoryEntities.length > 0) {
-                servico.categoryEntities.forEach(cat => {
-                    if (cat.name) {
-                        categorias.add(cat.name);
-                    }
-                });
-            }
+    // ----- FILTRO DE MODALIDADE -----
+    const selectModalidade = document.getElementById("filtro-modalidade");
+    if (selectModalidade) {
+        selectModalidade.addEventListener("change", function () {
+            modalidadeAtual = this.value;
+            aplicarFiltrosCombinados();
         });
-        return Array.from(categorias).sort();
-    }
-
-    // Popular o datalist com categorias dos serviços
-    function popularCategoriasDatalist(servicos) {
-        const datalist = document.getElementById("categorias-lista");
-        if (!datalist) return;
-        
-        const categorias = extrairCategoriasUnicas(servicos);
-        datalist.innerHTML = "";
-        
-        categorias.forEach(cat => {
-            const option = document.createElement("option");
-            option.value = cat;
-            datalist.appendChild(option);
-        });
-        
-        console.log("Categorias disponíveis:", categorias);
     }
 
     // ----- SLIDER E TOOLTIP -----
@@ -73,571 +114,337 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnLimparTempo = document.getElementById("btn-limpar-tempo");
     const tempoSelecionadoDiv = document.getElementById("tempo-selecionado");
 
-    // Atualizar tooltip com o valor atual do slider
     function updateTooltip() {
         if (!slider || !tooltip) return;
-
         const val = parseInt(slider.value);
         const min = parseInt(slider.min);
         const max = parseInt(slider.max);
-        
-        // Calcula o intervalo de tempo
         let minTempo = val === 5 ? 0 : val - 5;
         let maxTempo = val;
-        
         tooltip.textContent = `${minTempo}-${maxTempo}`;
-
-        // Posicionamento da tooltip
         const sliderWidth = slider.offsetWidth;
-        const thumbWidth = 16; // Tamanho reduzido da bolinha
+        const thumbWidth = 16;
         const percent = (val - min) / (max - min);
         const pos = percent * (sliderWidth - thumbWidth) + (thumbWidth / 2);
-        
-        // Ajuste fino para alinhar com a bolinha
         const tooltipWidth = tooltip.offsetWidth;
         tooltip.style.left = `calc(${pos}px - ${tooltipWidth / 2}px)`;
     }
 
-    // Função para garantir que o valor seja múltiplo de 5
     function ajustarValorSlider() {
         if (!slider) return;
-        
         let valor = parseInt(slider.value);
         const min = parseInt(slider.min);
         const max = parseInt(slider.max);
         const step = 5;
-        
-        // Arredonda para o múltiplo de 5 mais próximo
         valor = Math.round(valor / step) * step;
-        
-        // Garante que está dentro dos limites
         if (valor < min) valor = min;
         if (valor > max) valor = max;
-        
         slider.value = valor;
         updateTooltip();
     }
 
-    // Função para obter o intervalo de tempo do slider
     function getIntervaloTempo() {
         if (!slider) return { min: 0, max: 5 };
-        
         const val = parseInt(slider.value);
-        const minTempo = val === 5 ? 0 : val - 5;
-        const maxTempo = val;
-        
-        return { min: minTempo, max: maxTempo };
+        return { min: val === 5 ? 0 : val - 5, max: val };
     }
 
-    // Atualizar visibilidade do botão de limpar tempo
     function atualizarBotaoLimparTempo() {
         if (btnLimparTempo) {
-            if (tempoAtual) {
-                btnLimparTempo.classList.add("visivel");
-            } else {
-                btnLimparTempo.classList.remove("visivel");
-            }
+            tempoAtual ? btnLimparTempo.classList.add("visivel") : btnLimparTempo.classList.remove("visivel");
         }
     }
 
-    // Função para filtrar serviços por intervalo de tempo
     function filtrarPorTempo(intervalo) {
         if (!intervalo) {
-            // Se não houver intervalo, mostra todos os serviços
-            servicosFiltrados = [...todosServicos];
             tempoAtual = null;
-            tempoSelecionadoDiv.textContent = "";
-            tempoSelecionadoDiv.classList.remove("ativa");
-            console.log("Filtro de tempo removido. Mostrando todos os serviços.");
+            if (tempoSelecionadoDiv) { tempoSelecionadoDiv.textContent = ""; tempoSelecionadoDiv.classList.remove("ativa"); }
         } else {
-            // Filtra serviços que estão dentro do intervalo de tempo
-            servicosFiltrados = todosServicos.filter(servico => {
-                const tempoServico = servico.timeChronos || 0;
-                return tempoServico >= intervalo.min && tempoServico <= intervalo.max;
-            });
-            
             tempoAtual = intervalo;
-            tempoSelecionadoDiv.textContent = `Filtrando por: ${intervalo.min}-${intervalo.max} chronos`;
-            tempoSelecionadoDiv.classList.add("ativa");
-            console.log(`Filtrados ${servicosFiltrados.length} serviços pelo tempo: ${intervalo.min}-${intervalo.max} chronos`);
+            if (tempoSelecionadoDiv) { tempoSelecionadoDiv.textContent = `Filtrando por: ${intervalo.min}-${intervalo.max} chronos`; tempoSelecionadoDiv.classList.add("ativa"); }
         }
-        
         atualizarBotaoLimparTempo();
         aplicarFiltrosCombinados();
     }
 
-    // Função para aplicar filtro de tempo quando clicar em OK
-    function aplicarFiltroTempo() {
-        const intervalo = getIntervaloTempo();
-        filtrarPorTempo(intervalo);
-    }
-
-    // Função para limpar o filtro de tempo
-    function limparFiltroTempo() {
-        filtrarPorTempo(null);
-    }
-
-    // Configurar eventos para o slider de tempo
     if (slider && tooltip) {
-        // Atualiza tooltip ao mover o slider
-        slider.addEventListener("input", function() {
-            ajustarValorSlider();
-            updateTooltip();
-        });
-        
-        // Atualiza tooltip ao soltar o slider
-        slider.addEventListener("change", function() {
-            ajustarValorSlider();
-            updateTooltip();
-        });
-        
-        // Atualiza tooltip ao redimensionar a janela
+        slider.addEventListener("input", function () { ajustarValorSlider(); updateTooltip(); });
+        slider.addEventListener("change", function () { ajustarValorSlider(); updateTooltip(); });
         window.addEventListener("resize", updateTooltip);
-        
-        // Inicializa com valor correto
         ajustarValorSlider();
         updateTooltip();
     }
-
-    // Configurar evento para o botão OK
-    if (btnAplicarTempo) {
-        btnAplicarTempo.addEventListener("click", aplicarFiltroTempo);
-    }
-
-    // Configurar evento para o botão X (limpar tempo)
-    if (btnLimparTempo) {
-        btnLimparTempo.addEventListener("click", limparFiltroTempo);
-    }
+    if (btnAplicarTempo) btnAplicarTempo.addEventListener("click", function () { filtrarPorTempo(getIntervaloTempo()); });
+    if (btnLimparTempo) btnLimparTempo.addEventListener("click", function () { filtrarPorTempo(null); });
 
     // ----- FILTRAGEM POR CATEGORIA -----
     const inputCategoria = document.getElementById("filtro-categorias");
     const btnLimparCategoria = document.getElementById("btn-limpar-categoria");
     const categoriaSelecionadaDiv = document.getElementById("categoria-selecionada");
 
-    // Mostrar/ocultar botão X baseado no conteúdo do input
     function atualizarBotaoLimpar() {
         if (btnLimparCategoria && inputCategoria) {
-            if (inputCategoria.value.trim() !== "" || categoriaAtual) {
-                btnLimparCategoria.classList.add("visivel");
-            } else {
-                btnLimparCategoria.classList.remove("visivel");
-            }
+            (inputCategoria.value.trim() !== "" || categoriaAtual) ? btnLimparCategoria.classList.add("visivel") : btnLimparCategoria.classList.remove("visivel");
         }
     }
 
-    // Função para filtrar serviços por categoria
     function filtrarPorCategoria(categoriaNome) {
         if (!categoriaNome || categoriaNome.trim() === "") {
-            // Se não houver categoria, remove o filtro
             categoriaAtual = null;
-            categoriaSelecionadaDiv.textContent = "";
-            categoriaSelecionadaDiv.classList.remove("ativa");
-            console.log("Filtro de categoria removido.");
+            if (categoriaSelecionadaDiv) { categoriaSelecionadaDiv.textContent = ""; categoriaSelecionadaDiv.classList.remove("ativa"); }
         } else {
-            // Define a categoria atual
             categoriaAtual = categoriaNome;
-            categoriaSelecionadaDiv.textContent = `Filtrando por: ${categoriaNome}`;
-            categoriaSelecionadaDiv.classList.add("ativa");
-            console.log(`Filtrando pela categoria: ${categoriaNome}`);
+            if (categoriaSelecionadaDiv) { categoriaSelecionadaDiv.textContent = `Filtrando por: ${categoriaNome}`; categoriaSelecionadaDiv.classList.add("ativa"); }
         }
-        
         atualizarBotaoLimpar();
         aplicarFiltrosCombinados();
     }
 
-    // Função para limpar o filtro de categoria
-    function limparFiltroCategoria() {
-        inputCategoria.value = "";
-        filtrarPorCategoria("");
-        inputCategoria.focus();
-    }
-
-    // Configurar eventos para o filtro de categoria
     if (inputCategoria) {
-        // Filtrar ao pressionar Enter
-        inputCategoria.addEventListener("keydown", function(e) {
-            if (e.key === "Enter") {
-                e.preventDefault(); // Previne comportamento padrão
-                const categoria = inputCategoria.value.trim();
-                if (categoria) {
-                    filtrarPorCategoria(categoria);
-                }
-            }
+        inputCategoria.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") { e.preventDefault(); const cat = inputCategoria.value.trim(); if (cat) filtrarPorCategoria(cat); }
         });
-        
-        // Atualizar visibilidade do botão X enquanto digita
-        inputCategoria.addEventListener("input", function() {
+        inputCategoria.addEventListener("input", function () {
             atualizarBotaoLimpar();
-            
-            // Se o input estiver vazio e havia um filtro ativo, limpa o filtro
-            if (this.value.trim() === "" && categoriaAtual) {
-                filtrarPorCategoria("");
-            }
+            if (this.value.trim() === "" && categoriaAtual) filtrarPorCategoria("");
         });
-        
-        // Filtrar também ao selecionar uma opção do datalist
-        inputCategoria.addEventListener("change", function() {
-            const categoria = inputCategoria.value.trim();
-            if (categoria) {
-                setTimeout(() => {
-                    filtrarPorCategoria(categoria);
-                }, 100);
-            }
+        inputCategoria.addEventListener("change", function () {
+            const cat = inputCategoria.value.trim();
+            if (cat) setTimeout(() => filtrarPorCategoria(cat), 100);
         });
     }
 
-    // Configurar evento para o botão X (limpar categoria)
     if (btnLimparCategoria) {
-        btnLimparCategoria.addEventListener("click", limparFiltroCategoria);
+        btnLimparCategoria.addEventListener("click", function () {
+            inputCategoria.value = "";
+            filtrarPorCategoria("");
+            inputCategoria.focus();
+        });
         atualizarBotaoLimpar();
     }
 
-    // ----- ORDENAÇÃO DE SERVIÇOS -----
+    // ----- ORDENAÇÃO -----
     const selectOrdenacao = document.getElementById("filtro-ordenacao");
 
-    // Função para ordenar serviços com base na opção selecionada
     function ordenarServicos(servicos, opcao) {
-        // Cria uma cópia do array para não modificar o original
-        const servicosOrdenados = [...servicos];
-        
-        switch(opcao) {
-            case "0": // Mais recentes (mantém como está - baseado no que o backend retorna)
-                return servicosOrdenados;
-                
-            case "1": // Mais antigos (inverte a ordem atual)
-                return servicosOrdenados.reverse();
-                
-            case "2": // Melhores avaliados (se tiver avaliação)
-                return servicosOrdenados.sort((a, b) => {
-                    const avaliacaoA = a.rating || 0;
-                    const avaliacaoB = b.rating || 0;
-                    return avaliacaoB - avaliacaoA; // Descendente
-                });
-                
-            case "3": // Maior tempo (chronos)
-                return servicosOrdenados.sort((a, b) => {
-                    const tempoA = a.timeChronos || 0;
-                    const tempoB = b.timeChronos || 0;
-                    return tempoB - tempoA; // Descendente (maior primeiro)
-                });
-                
-            case "4": // Menor tempo (chronos)
-                return servicosOrdenados.sort((a, b) => {
-                    const tempoA = a.timeChronos || 0;
-                    const tempoB = b.timeChronos || 0;
-                    return tempoA - tempoB; // Ascendente (menor primeiro)
-                });
-                
-            default:
-                return servicosOrdenados;
+        const s = [...servicos];
+        switch (opcao) {
+            case "0": return s;
+            case "1": return s.reverse();
+            case "2": return s.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            case "3": return s.sort((a, b) => (b.timeChronos || 0) - (a.timeChronos || 0));
+            case "4": return s.sort((a, b) => (a.timeChronos || 0) - (b.timeChronos || 0));
+            case "5": return s.sort((a, b) => new Date(a.deadline || "9999-12-31") - new Date(b.deadline || "9999-12-31"));
+            case "6": return s.sort((a, b) => new Date(b.deadline || "0000-01-01") - new Date(a.deadline || "0000-01-01"));
+            default: return s;
         }
     }
 
-    // Função para aplicar a ordenação
-    function aplicarOrdenacao() {
-        if (selectOrdenacao && servicosFiltrados.length > 0) {
-            const opcaoSelecionada = selectOrdenacao.value;
-            console.log(`Aplicando ordenação: opção ${opcaoSelecionada}`);
-            
-            // Ordena os serviços filtrados
-            const servicosOrdenados = ordenarServicos(servicosFiltrados, opcaoSelecionada);
-            
-            // Exibe os serviços ordenados
-            exibirServicos(servicosOrdenados);
-        }
-    }
-
-    // Configurar evento para a ordenação
     if (selectOrdenacao) {
-        selectOrdenacao.addEventListener("change", function() {
-            aplicarOrdenacao();
+        selectOrdenacao.addEventListener("change", function () {
+            if (servicosFiltrados.length > 0) {
+                exibirServicos(ordenarServicos(servicosFiltrados, this.value));
+            }
         });
     }
 
-    // ----- PESQUISA DE SERVIÇOS -----
+    // ----- PESQUISA -----
     const inputSearchBar = document.getElementById("input-search-bar");
-    
-    // Função para filtrar serviços por termo de busca
+
     function filtrarServicosPorTermo(termo) {
-        console.log(`Buscando por: "${termo}"`);
-        
-        if (!termo || termo.trim() === "") {
-            // Se termo vazio, remove o filtro de busca e aplica outros filtros
-            aplicarFiltrosCombinados();
-            return;
-        }
-        
-        const termoLowerCase = termo.toLowerCase().trim();
-        
-        // Começa com todos os serviços
-        let servicosParaFiltrar = [...todosServicos];
-        
-        // Aplica filtro de categoria se houver
+        if (!termo || termo.trim() === "") { aplicarFiltrosCombinados(); return; }
+        const termoLC = termo.toLowerCase().trim();
+        let lista = [...todosServicos];
         if (categoriaAtual) {
-            servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
-                if (!servico.categoryEntities || servico.categoryEntities.length === 0) {
-                    return false;
-                }
-                
-                return servico.categoryEntities.some(cat => {
-                    if (!cat.name) return false;
-                    return cat.name.toLowerCase().includes(categoriaAtual.toLowerCase());
-                });
-            });
+            lista = lista.filter(s => s.categoryEntities?.some(c => c.name?.toLowerCase().includes(categoriaAtual.toLowerCase())));
         }
-        
-        // Aplica filtro de tempo se houver
         if (tempoAtual) {
-            servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
-                const tempoServico = servico.timeChronos || 0;
-                return tempoServico >= tempoAtual.min && tempoServico <= tempoAtual.max;
-            });
+            lista = lista.filter(s => (s.timeChronos || 0) >= tempoAtual.min && (s.timeChronos || 0) <= tempoAtual.max);
         }
-        
-        // Aplica filtro de busca
-        servicosFiltrados = servicosParaFiltrar.filter(servico => {
-            const titulo = servico.title || '';
-            const descricao = servico.description || '';
-            
-            // Busca no título E/OU na descrição
-            return titulo.toLowerCase().includes(termoLowerCase) || 
-                   descricao.toLowerCase().includes(termoLowerCase);
-        });
-        
-        console.log(`Encontrados ${servicosFiltrados.length} serviços com o termo "${termo}"`);
-        
-        // Aplica ordenação se houver
+        if (modalidadeAtual) {
+            lista = lista.filter(s => s.modality === modalidadeAtual);
+        }
+        servicosFiltrados = lista.filter(s => (s.title || "").toLowerCase().includes(termoLC) || (s.description || "").toLowerCase().includes(termoLC));
         if (selectOrdenacao && selectOrdenacao.value !== "0") {
             servicosFiltrados = ordenarServicos(servicosFiltrados, selectOrdenacao.value);
         }
-        
         exibirServicos(servicosFiltrados);
     }
 
-    // Adiciona evento de input para a barra de pesquisa
     if (inputSearchBar) {
-        // Pesquisa enquanto digita (com debounce para performance)
         let timeoutId;
-        inputSearchBar.addEventListener("input", function() {
+        inputSearchBar.addEventListener("input", function () {
             clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                filtrarServicosPorTermo(this.value);
-            }, 300);
+            timeoutId = setTimeout(() => filtrarServicosPorTermo(this.value), 300);
         });
-
-        // Pesquisa ao pressionar Enter
-        inputSearchBar.addEventListener("keydown", function(e) {
-            if (e.key === "Enter") {
-                filtrarServicosPorTermo(this.value);
-            }
+        inputSearchBar.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") filtrarServicosPorTermo(this.value);
         });
-
-        // Pesquisa ao clicar no ícone de lupa
         const searchIcon = document.querySelector(".icon-search");
-        if (searchIcon) {
-            searchIcon.addEventListener("click", function() {
-                filtrarServicosPorTermo(inputSearchBar.value);
-            });
-        }
+        if (searchIcon) searchIcon.addEventListener("click", function () { filtrarServicosPorTermo(inputSearchBar.value); });
     }
 
-    // ----- FUNÇÃO PARA APLICAR TODOS OS FILTROS COMBINADOS -----
+    // ----- FILTROS COMBINADOS -----
     function aplicarFiltrosCombinados() {
-        let servicosParaFiltrar = [...todosServicos];
-        
-        // Aplica filtro de categoria
+        let lista = [...todosServicos];
         if (categoriaAtual) {
-            servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
-                if (!servico.categoryEntities || servico.categoryEntities.length === 0) {
-                    return false;
-                }
-                
-                return servico.categoryEntities.some(cat => {
-                    if (!cat.name) return false;
-                    return cat.name.toLowerCase().includes(categoriaAtual.toLowerCase());
-                });
-            });
+            lista = lista.filter(s => s.categoryEntities?.some(c => c.name?.toLowerCase().includes(categoriaAtual.toLowerCase())));
         }
-        
-        // Aplica filtro de tempo
         if (tempoAtual) {
-            servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
-                const tempoServico = servico.timeChronos || 0;
-                return tempoServico >= tempoAtual.min && tempoServico <= tempoAtual.max;
-            });
+            lista = lista.filter(s => (s.timeChronos || 0) >= tempoAtual.min && (s.timeChronos || 0) <= tempoAtual.max);
         }
-        
-        // Aplica filtro de busca se houver
+        if (modalidadeAtual) {
+            lista = lista.filter(s => s.modality === modalidadeAtual);
+        }
+        if (avaliacaoAtual) {
+            lista = lista.filter(s => (s.userEntity?.rating || s.rating || 4.9) >= avaliacaoAtual);
+        }
         const termoBusca = inputSearchBar?.value;
         if (termoBusca && termoBusca.trim() !== "") {
-            servicosParaFiltrar = servicosParaFiltrar.filter(servico => {
-                const titulo = servico.title || '';
-                const descricao = servico.description || '';
-                const termoLowerCase = termoBusca.toLowerCase().trim();
-                
-                return titulo.toLowerCase().includes(termoLowerCase) || 
-                       descricao.toLowerCase().includes(termoLowerCase);
-            });
+            const termoLC = termoBusca.toLowerCase().trim();
+            lista = lista.filter(s => (s.title || "").toLowerCase().includes(termoLC) || (s.description || "").toLowerCase().includes(termoLC));
         }
-        
-        servicosFiltrados = servicosParaFiltrar;
-        
-        // Aplica ordenação se houver alguma selecionada
+        servicosFiltrados = lista;
         if (selectOrdenacao && selectOrdenacao.value !== "0") {
             servicosFiltrados = ordenarServicos(servicosFiltrados, selectOrdenacao.value);
         }
-        
         exibirServicos(servicosFiltrados);
     }
 
     // ----- EXIBIÇÃO DE SERVIÇOS -----
     const requestsContainer = document.getElementById("requests");
-    const token = localStorage.getItem("auth_token");
 
-    // Função para exibir serviços no container
+    function extrairCategoriasUnicas(servicos) {
+        const cats = new Set();
+        servicos.forEach(s => s.categoryEntities?.forEach(c => { if (c.name) cats.add(c.name); }));
+        return Array.from(cats).sort();
+    }
+
+    function popularCategoriasDatalist(servicos) {
+        const datalist = document.getElementById("categorias-lista");
+        if (!datalist) return;
+        datalist.innerHTML = "";
+        extrairCategoriasUnicas(servicos).forEach(cat => {
+            const opt = document.createElement("option");
+            opt.value = cat;
+            datalist.appendChild(opt);
+        });
+    }
+
+    function formatarData(dateStr) {
+        if (!dateStr) return null;
+        const d = new Date(dateStr + "T00:00:00");
+        return d.toLocaleDateString("pt-BR");
+    }
+
     function exibirServicos(servicos) {
         if (!requestsContainer) return;
-
-        requestsContainer.innerHTML = ""; // Limpa container
+        requestsContainer.innerHTML = "";
 
         if (!servicos || servicos.length === 0) {
-            // Mensagem de "nenhum resultado" que ocupa todas as 4 colunas
-            const mensagem = document.createElement("div");
-            mensagem.className = "no-results-message";
-            
-            let mensagemTexto = "Nenhum serviço encontrado";
-            const filtrosAtivos = [];
-            
-            if (categoriaAtual) filtrosAtivos.push(`categoria "${categoriaAtual}"`);
-            if (tempoAtual) filtrosAtivos.push(`tempo ${tempoAtual.min}-${tempoAtual.max} chronos`);
-            
+            const msg = document.createElement("div");
+            msg.className = "no-results-message";
+            let texto = "Nenhum serviço encontrado";
+            const filtros = [];
+            if (categoriaAtual) filtros.push(`categoria "${categoriaAtual}"`);
+            if (tempoAtual) filtros.push(`tempo ${tempoAtual.min}-${tempoAtual.max} chronos`);
+            if (modalidadeAtual) filtros.push(`modalidade "${modalidadeAtual}"`);
             const termoBusca = inputSearchBar?.value;
-            if (termoBusca && termoBusca.trim() !== "") {
-                filtrosAtivos.push(`busca "${termoBusca}"`);
-            }
-            
-            if (filtrosAtivos.length > 0) {
-                mensagemTexto += ` com ${filtrosAtivos.join(" e ")}`;
-            }
-            mensagemTexto += ".";
-            
-            mensagem.textContent = mensagemTexto;
-            requestsContainer.appendChild(mensagem);
+            if (termoBusca && termoBusca.trim() !== "") filtros.push(`busca "${termoBusca}"`);
+            if (filtros.length > 0) texto += ` com ${filtros.join(" e ")}`;
+            texto += ".";
+            msg.textContent = texto;
+            requestsContainer.appendChild(msg);
             return;
         }
 
-        // GARANTE QUE O GRID SEMPRE TENHA 4 COLUNAS
         requestsContainer.style.gridTemplateColumns = "repeat(4, 1fr)";
         requestsContainer.style.gap = "20px";
 
         servicos.forEach(servico => {
             const card = document.createElement("div");
             card.className = "service-card";
-            card.style.width = "100%"; // Força 100% da coluna
+            card.style.width = "100%";
+            card.style.cursor = "pointer";
 
-            // Verifica se serviceImage existe e é uma string base64 válida
-            let imageSrc = "/static/img/default-service.png"; // Imagem padrão
-            if (servico.serviceImage && typeof servico.serviceImage === 'string') {
+            let imageSrc = "/static/img/default-service.png";
+            if (servico.serviceImage && typeof servico.serviceImage === "string") {
                 imageSrc = `data:image/png;base64,${servico.serviceImage}`;
             }
 
-            // Limita o título a 25 caracteres
-            const titulo = servico.title || 'Sem título';
-            const tituloLimitado = titulo.length > 25 ? titulo.substring(0, 25) + '...' : titulo;
-
-            // Limita a descrição (se tiver)
-            const descricao = servico.description || '';
-            const descricaoLimitada = descricao.length > 60 ? descricao.substring(0, 60) + '...' : descricao;
-
-            // Obtém o tempo do serviço
+            const titulo = servico.title || "Sem título";
+            const tituloLimitado = titulo.length > 25 ? titulo.substring(0, 25) + "..." : titulo;
+            const descricao = servico.description || "";
+            const descricaoLimitada = descricao.length > 60 ? descricao.substring(0, 60) + "..." : descricao;
             const tempoServico = servico.timeChronos || 0;
-            
-            // Verifica se o tempo está dentro do filtro (para destaque)
-            let classeTempoDestaque = '';
+            let classeTempoDestaque = "";
             if (tempoAtual && tempoServico >= tempoAtual.min && tempoServico <= tempoAtual.max) {
-                classeTempoDestaque = ' tempo-destaque';
+                classeTempoDestaque = " tempo-destaque";
             }
 
-            // Limita categorias (máximo 3) e destaca a categoria filtrada
-            let categoriasHTML = '';
+            let categoriasHTML = "";
             if (servico.categoryEntities && servico.categoryEntities.length > 0) {
-                const categoriasLimitadas = servico.categoryEntities.slice(0, 3); // Máximo 3 categorias
-                categoriasHTML = categoriasLimitadas.map(cat => {
-                    const categoriaNome = cat.name || 'Categoria';
-                    let classeExtra = '';
-                    
-                    // Destaca a categoria que está sendo filtrada
-                    if (categoriaAtual && categoriaNome.toLowerCase().includes(categoriaAtual.toLowerCase())) {
-                        classeExtra = ' categoria-destaque';
-                    }
-                    
-                    const nomeExibicao = categoriaNome.substring(0, 12) + (categoriaNome.length > 12 ? '...' : '');
-                    return `
-                        <div class="category-service${classeExtra}" title="${categoriaNome}">
-                            <img class="category-service-img" src="/static/img/Paintbrush.png" alt="Category Icon">
-                            <p class="category-service-text">${nomeExibicao}</p>
-                        </div>
-                    `;
-                }).join('');
+                categoriasHTML = servico.categoryEntities.slice(0, 3).map(cat => {
+                    const nome = cat.name || "Categoria";
+                    let classeExtra = "";
+                    if (categoriaAtual && nome.toLowerCase().includes(categoriaAtual.toLowerCase())) classeExtra = " categoria-destaque";
+                    const nomeExibicao = nome.substring(0, 12) + (nome.length > 12 ? "..." : "");
+                    return `<div class="category-service${classeExtra}" title="${nome}"><img class="category-service-img" src="/static/img/Paintbrush.png" alt=""><p class="category-service-text">${nomeExibicao}</p></div>`;
+                }).join("");
             } else {
                 categoriasHTML = '<div class="category-service"><p class="category-service-text">Sem categorias</p></div>';
             }
 
-            // Monta o HTML do card do serviço
+            const prazoStr = servico.deadline ? `<p class="service-deadline">Prazo: ${formatarData(servico.deadline)}</p>` : "";
+            const modalidadeStr = servico.modality ? `<span class="badge-modality badge-${servico.modality.toLowerCase().replace('í','i')}">${servico.modality}</span>` : "";
+
             card.innerHTML = `
                 <img src="${imageSrc}" alt="Imagem do Serviço" class="service-image">
                 <div class="service-info">
-                    <p class="service-title" title="${servico.title || ''}">${tituloLimitado}</p>
+                    <p class="service-title" title="${servico.title || ""}">${tituloLimitado}</p>
                     <p class="user-service" title="Postado por ${servico.userEntity?.name || 'Usuário desconhecido'}">
-                        Postado por ${servico.userEntity?.name || 'Usuário desconhecido'}
+                        Postado por ${servico.userEntity?.name || "Usuário desconhecido"}
                     </p>
-                    <p class="service-description" title="${descricao}">
-                        ${descricaoLimitada}
-                    </p>
+                    <p class="service-description" title="${descricao}">${descricaoLimitada}</p>
+                    ${prazoStr}
+                    ${modalidadeStr}
                     <div class="qty-chronos-service${classeTempoDestaque}">
-                        <img class="qty-chronos-service-img" src="/static/img/Coin.png" alt="Chronos Icon">
+                        <img class="qty-chronos-service-img" src="/static/img/Coin.png" alt="">
                         <p class="qty-chronos-service-text">${tempoServico} chronos</p>
                     </div>
-                    <div class="categories-service">
-                        ${categoriasHTML}
-                    </div>
+                    <div class="categories-service">${categoriasHTML}</div>
                 </div>
             `;
+
+            card.addEventListener("click", function () {
+                window.location.href = `/view_service?id=${servico.id}`;
+            });
 
             requestsContainer.appendChild(card);
         });
 
-        // Preenche espaços vazios se houver menos de 4 cards na última linha
         const cardsRestantes = 4 - (servicos.length % 4);
         if (cardsRestantes > 0 && cardsRestantes < 4) {
             for (let i = 0; i < cardsRestantes; i++) {
                 const emptyCard = document.createElement("div");
                 emptyCard.className = "service-card";
-                emptyCard.style.visibility = "hidden"; // Esconde mas mantém o espaço
+                emptyCard.style.visibility = "hidden";
                 requestsContainer.appendChild(emptyCard);
             }
         }
     }
 
     // ----- FETCH DE SERVIÇOS -----
-    if (!requestsContainer) {
-        console.error("Elemento #requests não encontrado.");
-        return;
-    }
+    if (!requestsContainer) { console.error("Elemento #requests não encontrado."); return; }
 
     if (!token) {
-        console.error("Token não encontrado no localStorage.");
         requestsContainer.innerHTML = "<p style='color: white;'>Você precisa estar logado para visualizar os serviços.</p>";
         return;
     }
 
-    // Faz a requisição para o backend Flask
-    fetch("http://localhost:5000/service/get/all", {
+    fetch("/service/get/all", {
         method: "GET",
-        headers: {
-            "Authorization": "Bearer " + token,
-            "Content-Type": "application/json"
-        }
+        headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" }
     })
     .then(async response => {
         if (!response.ok) {
@@ -653,41 +460,23 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.json();
     })
     .then(servicos => {
-        console.log("Serviços recebidos:", servicos);
-        
-        if (!servicos || servicos.length === 0) {
-            exibirServicos([]);
-            return;
-        }
-
-        // Armazena todos os serviços nas variáveis globais
+        if (!servicos || servicos.length === 0) { exibirServicos([]); return; }
         todosServicos = servicos;
-        servicosFiltrados = [...servicos]; // Inicialmente mostra todos
-        
-        // Popular o datalist com as categorias dos serviços
+        servicosFiltrados = [...servicos];
         popularCategoriasDatalist(servicos);
-        
-        // Inicializa botões
         atualizarBotaoLimpar();
         atualizarBotaoLimparTempo();
-        
-        // Aplica ordenação inicial se houver seleção padrão
         if (selectOrdenacao && selectOrdenacao.value !== "0") {
             servicosFiltrados = ordenarServicos(servicosFiltrados, selectOrdenacao.value);
         }
-        
-        // Configura a busca se houver algo digitado
         if (inputSearchBar && inputSearchBar.value.trim() !== "") {
-            setTimeout(() => {
-                filtrarServicosPorTermo(inputSearchBar.value);
-            }, 100);
+            setTimeout(() => filtrarServicosPorTermo(inputSearchBar.value), 100);
         } else {
-            // Exibe todos os serviços inicialmente
             exibirServicos(servicosFiltrados);
         }
     })
     .catch(error => {
-        console.error("Erro completo ao carregar serviços:", error);
+        console.error("Erro ao carregar serviços:", error);
         exibirServicos([]);
     });
 });

@@ -3,109 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Atualiza os caminhos para usar a função url_for do Flask -->
-    <title>Chronora</title>
+    <title>Criar Pedido - Chronora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shared.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ServiceCreation.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/index.css') }}">
 </head>
 <body>
-    <div id="container">
-        <div id="container-header">
-            <div id="icon-left">
-                <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
-                <p id="icon-left-text">Chronora</p>
-            </div>
-            <div id="search-bar">
-                <div class="search-container">
-                    <input type="text" name="search-bar" placeholder="Pintura de parede, aula de inglês..." id="input-search-bar" autocomplete="off">
-                    <img src="{{ url_for('static', filename='img/Search.png') }}" alt="" class="icon-search">
-                </div>
-            </div>
-            <div id="navbar-buttons">
-                <a class="navbar-a" href="{{ url_for('service_creation_page') }}"><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Plus.png') }}" alt=""></a>
-                <div class="qty-chronos">
-                    <img class="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
-                    <p class="qty-chronos-text">123</p> <!-- Valor fixo ou dinâmico -->
-                </div>
-                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Briefcase.png') }}" alt=""></a>
-                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Profile.png') }}" alt=""></a>
-                <a class="navbar-a" href=""><img class="navbar-buttons-img" id="icon-add-service" src="{{ url_for('static', filename='img/Settings.png') }}" alt=""></a>
+    <!-- Header -->
+    <div id="container-header">
+        <div id="icon-left">
+            <img id="icon-left-img" src="{{ url_for('static', filename='img/LogoBackgroundYellow.png') }}" alt="">
+            <p id="icon-left-text">Chronora</p>
+        </div>
+        <div id="search-bar">
+            <div class="search-container">
+                <input type="text" placeholder="Pintura de parede, aula de inglês..." id="input-search-bar" autocomplete="off">
+                <img src="{{ url_for('static', filename='img/Search.png') }}" alt="" class="icon-search">
             </div>
         </div>
-        <div id="container-background">
-            <img class="background" id="comb-left" src="{{ url_for('static', filename='img/Comb5.png') }}" alt="">
-            <img class="background" id="comb-right" src="{{ url_for('static', filename='img/Comb6.png') }}" alt="">
-            <img class="background" id="bar-right" src="{{ url_for('static', filename='img/BarDescendingRight.png') }}" alt="">
-            <img class="background" id="bar-left" src="{{ url_for('static', filename='img/BarAscending.png') }}" alt="">
+        <div id="navbar-buttons">
+            <div class="qty-chronos">
+                <img class="qty-chronos-img" src="{{ url_for('static', filename='img/Coin.png') }}" alt="">
+                <p class="qty-chronos-text">0</p>
+            </div>
+            <a class="navbar-a" href="" title="Perfil"><img class="navbar-buttons-img" src="{{ url_for('static', filename='img/Profile.png') }}" alt=""></a>
+            <a class="navbar-a" href="" title="Configurações"><img class="navbar-buttons-img" src="{{ url_for('static', filename='img/Settings.png') }}" alt=""></a>
         </div>
+    </div>
 
-        <!-- Formulário principal -->
-        <div id="container-form">
+    <!-- Hexágonos -->
+    <div class="page-bg">
+        <img class="hex-deco" id="hex-sc-left" src="{{ url_for('static', filename='img/Comb5.png') }}" alt="">
+        <img class="hex-deco" id="hex-sc-right" src="{{ url_for('static', filename='img/Comb6.png') }}" alt="">
+        <div class="gold-bar" id="sc-bar-r1"></div>
+        <div class="gold-bar" id="sc-bar-l1"></div>
+    </div>
+
+    <!-- Modal/Card centralizado -->
+    <div id="page-wrapper">
+        <div id="form-card">
             <h1>Criação do pedido</h1>
+            <form id="register-form" autocomplete="off" novalidate>
 
-            <!-- Formulário com id e autocomplete desabilitado -->
-            <form id="register-form" class="form-container" autocomplete="off" novalidate>
-                <!-- Título -->
                 <div class="form-group">
                     <div class="field-with-error">
-                        <input type="text" name="titulo" placeholder="Título" id="input-title" required autocomplete="off">
-                        <span class="error-symbol outside" id="title-error">⊝</span>
-                    </div>
-                </div>
-                
-                <!-- Descrição -->
-                <div class="form-group">
-                    <div class="field-with-error">
-                        <textarea name="descricao" placeholder="Descrição" id="input-description" required autocomplete="off"></textarea>
-                        <span class="error-symbol outside" id="description-error">⊝</span>
-                    </div>
-                </div>
-                
-                <!-- Tempo em Chronos -->
-                <div class="form-group">
-                    <div class="field-with-error">
-                        <input type="number" min="1" max="100" name="tempoChronos" placeholder="Tempo em Chronos (1-100)" id="input-time-chronos" required autocomplete="off">
-                        <span class="error-symbol outside" id="time-error">⊝</span>
-                    </div>
-                </div>
-                
-                <!-- Campo de categoria -->
-                <div class="form-group category-group">
-                    <div class="category-input-container">
-                        <div class="field-with-error">
-                            <div class="category-content">
-                                <label for="input-category" id="label-category">Categorias</label>
-                                <div class="input-with-tags">
-                                    <input type="text" name="categoria" id="input-category" placeholder="Escreva e aperte Enter" autocomplete="off" />
-                                    <div id="category-tag-list" class="tag-list"></div>
-                                </div>
-                            </div>
-                            <span class="error-symbol outside" id="category-error">⊝</span>
-                        </div>
+                        <input type="text" id="input-title" placeholder="Título" required autocomplete="off">
+                        <span class="error-symbol" id="title-error">⊝</span>
                     </div>
                 </div>
 
-                <!-- Imagem -->
                 <div class="form-group">
-                    <input type="file" name="input-service-image" id="input-service-image" accept=".jpg,.jpeg,.png" autocomplete="off" required>
+                    <div class="field-with-error">
+                        <textarea id="input-description" placeholder="Descrição" required autocomplete="off"></textarea>
+                        <span class="error-symbol" id="description-error">⊝</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="field-with-error">
+                        <input type="number" min="1" max="100" id="input-time-chronos" placeholder="Tempo em Chronos" required autocomplete="off">
+                        <span class="error-symbol" id="time-error">⊝</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="field-with-error">
+                        <input type="text" id="input-category" placeholder="Categoria(s)" autocomplete="off">
+                        <span class="error-symbol" id="category-error">⊝</span>
+                    </div>
+                    <div id="category-tag-list" class="tag-list"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="field-with-error two-col optional-row">
+                        <input type="date" id="input-deadline" autocomplete="off">
+                        <select id="input-modality">
+                            <option value="">Modalidade</option>
+                            <option value="Presencial">Presencial</option>
+                            <option value="Remoto">Remoto</option>
+                            <option value="Híbrido">Híbrido</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="file" id="input-service-image" accept=".jpg,.jpeg,.png" style="display:none;">
                     <button type="button" id="btn-service-image">
-                        <span class="btn-text">Imagem do Pedido</span>
+                        <span class="btn-text">Imagem do pedido</span>
                         <img src="{{ url_for('static', filename='img/AddImage.png') }}" alt="" id="icon-service-image">
                     </button>
                     <span id="service-image-chosen"></span>
                 </div>
 
                 <div id="bottom-btns">
-                    <!-- Link de cancelar estilizado como botão -->
-                    <a href="{{ url_for('main_page') }}" id="btn-cancel" class="btn-cancel-link">
-                        Cancelar
-                    </a>
-                    <button type="submit" id="btn-register">Criar Pedido</button>
+                    <a href="{{ url_for('main_page') }}" id="btn-cancel" class="btn-cancel-link">Cancelar</a>
+                    <button type="submit" id="btn-register">Criar pedido</button>
                 </div>
             </form>
         </div>
-        <!-- Atualiza o caminho do script JS -->
-        <script src="{{ url_for('static', filename='js/ServiceCreation.js') }}"></script>
     </div>
+
+    <script src="{{ url_for('static', filename='js/ServiceCreation.js') }}"></script>
 </body>
 </html>
